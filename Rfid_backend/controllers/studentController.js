@@ -34,16 +34,39 @@ const getAllStudents = asyncHandler(async (req, res) => {
 });
 
 // @desc Otp
-// @route POST /Student
+// @route POST /otp
 // @access Private
-const otp =asyncHandler(async(req,res)=>{
-  const {reqData,reqData2}=req.body;
+
+const otp = asyncHandler(async (req, res) => {
+  const { reqData, reqData2 } = req.body;
   try {
-    
+    let emailExists;
+    if (reqData2) {
+      emailExists = await Student.findOne({ rfid: reqData2 });
+    }
+    if (emailExists != null && reqData === emailExists.otp) {
+      // Update the verification status based on the RFID
+      await Student.updateOne({ rfid: emailExists.rfid },
+        {
+          $set: {
+            isVerified: true
+          },
+        }
+      );
+      return res.status(200).json({ success: true });
+    } else {
+      return res.status(401).json({
+        message: "Invalid OTP",
+        success: false
+      });
+    }
   } catch (error) {
-    
+    // Handle error
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
 
 // @desc Create New Student
 // @route POST /Student
@@ -80,7 +103,9 @@ const createNewStudent = asyncHandler(async (req, res) => {
     email,
     rfid,
     password: hashedPwd,
-    Year: Year
+    Year: Year,
+    otp:OTP,
+    isVerified: false
   };
 
   // Create and Store New student
