@@ -34,6 +34,9 @@ app.use("/attendance", require("./routes/attendanceRoutes"));
 app.use("/time_schedule", require("./routes/timeScheduleRoutes"));
 app.use("/teacher", require("./routes/teacherRoutes"));
 app.use("/student", require("./routes/studentRoutes"));
+// app.use("/otp", require("./routes/studentRoutes"));
+app.use("/Hardware", require("./routes/HardwareRoutes"));
+app.use("/otp",require("./routes/otp"));
 
 app.all("*", (req, res) => {
   res.status(404);

@@ -11,12 +11,7 @@ router
 router
   .route("/")
   .get(studentController.getAllStudents)
-  .post(studentController.createNewStudent)
-  // .post(studentController.otp);
-
-
-router
-  .route("/otp")
-  .post(studentController.otp);
+  .post(studentController.createNewStudent);
+ 
 
 module.exports = router;
