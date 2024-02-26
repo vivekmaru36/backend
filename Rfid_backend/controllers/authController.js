@@ -29,7 +29,7 @@ const teacherLogin = asyncHandler(async (req, res) => {
       name: teacher.name,
       role: teacher.role,
       course: teacher.course,
-      rfid : teacher.rfid
+      rfid: teacher.rfid
     });
   }
 });
@@ -51,6 +51,15 @@ const studentLogin = asyncHandler(async (req, res) => {
 
   const match = await bcrypt.compare(password, student.password);
   if (!match) return res.status(401).json({ message: "Incorrect Password" });
+
+
+  if (student.isVerified === "false") {
+    // Delete the particular student
+    await Student.findByIdAndDelete(student._id);
+
+    return res.status(501).json({ message: "Please register again, you were not verified" });
+  }
+
   else {
     res.status(200).json({
       _id: student.id,
