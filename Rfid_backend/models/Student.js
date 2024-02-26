@@ -33,7 +33,7 @@ const studentSchema = new mongoose.Schema({
   isVerified: {
     type: String,
     required: true
-}
+  }
 });
 
 module.exports = mongoose.model("Student", studentSchema);

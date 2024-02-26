@@ -3,6 +3,9 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const Student = require("../models/Student");
 
+const { generateOTP } = require("./services/otp");
+const { sendOTP, sendResetMail } = require("./services/emailService");
+
 // @desc Get Teacher
 // @route GET /teacher
 // @access Private
@@ -59,7 +62,7 @@ const getTeacherList = asyncHandler(async (req, res) => {
 // @route POST /Teacher
 // @access Private
 const createNewTeacher = asyncHandler(async (req, res) => {
-  const {  name, email, rfid, course, password, roles } =
+  const { name, email, rfid, course, password, roles } =
     req.body;
 
   // Confirm Data
@@ -80,6 +83,13 @@ const createNewTeacher = asyncHandler(async (req, res) => {
   if (duplicate || duplicates) {
     return res.status(409).json({ message: "RFid Already Registered" });
   }
+  const OTP = generateOTP();
+  const emailRes = await sendOTP({ OTP, to: email });
+
+  if (emailRes.rejected.length != 0)
+    return res.status(500).json({
+      message: "Something went wrong! with otp sending Try Again",
+    });
 
   // Hash Password
   const hashedPwd = await bcrypt.hash(password, 10); // salt rounds
@@ -91,13 +101,15 @@ const createNewTeacher = asyncHandler(async (req, res) => {
     course,
     password: hashedPwd,
     roles,
+    otp: OTP,
+    isVerified: false
   };
 
   // Create and Store New teacher
   const teacher = await Teacher.create(teacherObj);
 
   if (teacher) {
-    res.status(201).json({ message: `New Teacher ${username} Registered` });
+    res.status(201).json({ message: `New Teacher ${name} Registered` });
   } else {
     res.status(400).json({ message: "Invalid data received" });
   }
