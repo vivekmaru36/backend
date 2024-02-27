@@ -13,7 +13,9 @@ const HardwareRFid = asyncHandler(async (req, res) => {
     console.log(rfid)
     console.log(geoLocation)
     console.log(Ip)
-    console.log(ucurrentTime)
+    console.log(ucurrentTime);
+    const currentTttime = new Date();
+    console.log("Apna : ",currentTttime);
 
     // Call the / endpoint to get hardware details
     let hardwaredetails;
@@ -249,5 +251,5 @@ const HardwareRFid = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-    HardwareRFid
+    HardwareRFid,
 };

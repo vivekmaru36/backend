@@ -33,6 +33,10 @@ const HardwareRfidSwipeSchema = new mongoose.Schema({
     },
     attendance_count:{
         type: Number
+    },
+    Venue:{
+        type:String,
+        default:'Hardware Lab'
     } 
 })
 
