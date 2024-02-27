@@ -1,48 +1,18 @@
 const asyncHandler = require("express-async-handler");
 const Teacher = require("../models/Teacher");
 const Hardware = require("../models/Hardware");
-
-// @desc set lec in hardware
-// @route Post /HardwarePost
-// @access Private
-
-// const setLec = asyncHandler(async (req, res) => {
-//     const { Teacher, Subject, stime, etime, date,rfid } = req.body;
-
-//     // Confirm Data
-//     if (!Teacher || !Subject || !stime || !etime || !date || !rfid) {
-//         return res.status(400).json({ message: "All fields are required" });
-//     }
-
-//     const HardwareObj = {
-//         Teacher,
-//         Subject,
-//         stime,
-//         etime,
-//         date,
-//         rfid
-//     };
-
-//     // Create and Store New Lec
-//     const Lecdetails = await Hardware.create(HardwareObj);
-//     if (Lecdetails) {
-//         res.status(201).json({ message: `New Lec created by ${Teacher} in Hardware Lab` });
-//     } else {
-//         res.status(400).json({ message: "Invalid data received For Setting Lec Details" });
-//     }
-
-// });
+const HardwaresHistorySchema = require("../models/HardwareHistory")
 
 const setLec = asyncHandler(async (req, res) => {
     const { Teacher, Subject, stime, etime, date, rfidno, course } = req.body;
 
-    console.log(Teacher);
-    console.log(Subject);
-    console.log(stime);
-    console.log(etime);
-    console.log(date);
-    console.log(rfidno);
-    console.log(course);
+    // console.log(Teacher);
+    // console.log(Subject);
+    // console.log(stime);
+    // console.log(etime);
+    // console.log(date);
+    // console.log(rfidno);
+    // console.log(course);
 
     // Confirm Data
     if (!Teacher || !Subject || !stime || !etime || !date || !rfidno || !course) {
@@ -73,6 +43,10 @@ const setLec = asyncHandler(async (req, res) => {
 
     // Create and Store New Lec
     const Lecdetails = await Hardware.create(HardwareObj);
+
+    // history
+    const HardwaresHistory = await HardwaresHistorySchema.create(HardwareObj);
+
     if (Lecdetails) {
         res.status(201).json({ message: `New Lec created by ${Teacher} in Hardware Lab` });
     } else {
@@ -105,8 +79,8 @@ const forceDeLec = asyncHandler(async (req, res) => {
     try {
         // Check if the user is a teacher and present in hardware
         const isTeacher = await Hardware.findOne({ rfidno:rfid });
-        console.log(rfid);
-        console.log(isTeacher);
+        // console.log(rfid);
+        // console.log(isTeacher);
 
         if (isTeacher) {
             // If the user is a teacher, delete all data from the hardware collection

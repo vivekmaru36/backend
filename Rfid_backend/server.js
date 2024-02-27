@@ -37,6 +37,7 @@ app.use("/student", require("./routes/studentRoutes"));
 // app.use("/otp", require("./routes/studentRoutes"));
 app.use("/Hardware", require("./routes/HardwareRoutes"));
 app.use("/otp",require("./routes/otp"));
+app.use("/HardwareRoom",require("./routes/HardwareRoomRfidRoutes"));
 
 app.all("*", (req, res) => {
   res.status(404);
