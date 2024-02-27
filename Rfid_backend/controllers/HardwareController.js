@@ -44,8 +44,13 @@ const setLec = asyncHandler(async (req, res) => {
     // Create and Store New Lec
     const Lecdetails = await Hardware.create(HardwareObj);
 
+    // Store _id of Lecdetails
+    const lecId = Lecdetails._id;
+
     // history
-    const HardwaresHistory = await HardwaresHistorySchema.create(HardwareObj);
+    // const HardwaresHistory = await HardwaresHistorySchema.create(HardwareObj);
+    const HardwaresHistory = await HardwaresHistorySchema.create({ ...HardwareObj, _id: lecId._id });
+
 
     if (Lecdetails) {
         res.status(201).json({ message: `New Lec created by ${Teacher} in Hardware Lab` });
@@ -78,13 +83,13 @@ const forceDeLec = asyncHandler(async (req, res) => {
     const { rfid } = req.body;
     try {
         // Check if the user is a teacher and present in hardware
-        const isTeacher = await Hardware.findOne({ rfidno:rfid });
+        const isTeacher = await Hardware.findOne({ rfidno: rfid });
         // console.log(rfid);
         // console.log(isTeacher);
 
         if (isTeacher) {
             // If the user is a teacher, delete all data from the hardware collection
-            await Hardware.deleteMany({ rfidno:rfid });
+            await Hardware.deleteMany({ rfidno: rfid });
 
             return res.status(200).json({ success: true, message: 'Hardware data deleted successfully.' });
         } else {
