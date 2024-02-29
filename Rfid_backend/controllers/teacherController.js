@@ -6,57 +6,10 @@ const Student = require("../models/Student");
 const { generateOTP } = require("./services/otp");
 const { sendOTP, sendResetMail } = require("./services/emailService");
 
-// @desc Get Teacher
-// @route GET /teacher
-// @access Private
-const getTeacher = asyncHandler(async (req, res) => {
-  if (!req?.params?.id) return res.status(400).json({ message: "ID Missing" });
 
-  const teacher = await Teacher.findById(req.params.id)
-    .select("-password -_id -__v")
-    .lean();
-  if (!teacher) {
-    return res.status(404).json({ message: "No Teacher Found." });
-  }
-  res.json(teacher);
-});
 
-// @desc Get all Teachers
-// @route GET /Teachers
-// @access Private
-const getNewTeachers = asyncHandler(async (req, res) => {
-  if (!req?.params?.department)
-    return res.status(400).json({ message: "Params Missing" });
 
-  const teachers = await Teacher.find({
-    department: req.params.department,
-    roles: [],
-  })
-    .select("-password")
-    .lean();
-  if (!teachers?.length) {
-    return res.status(404).json({ message: "No Registered Teacher(s) Found." });
-  }
-  res.json(teachers);
-});
 
-// @desc Get Teacher Names only
-// @route GET /TeachersList
-// @access Private
-const getTeacherList = asyncHandler(async (req, res) => {
-  if (!req?.params?.department)
-    return res.status(400).json({ message: "Params Missing" });
-
-  const teachersList = await Teacher.find({
-    department: req.params.department,
-  })
-    .select("name")
-    .lean();
-  if (!teachersList?.length) {
-    return res.status(400).json({ message: "No Teacher(s) Found" });
-  }
-  res.json(teachersList);
-});
 
 // @desc Create New Teacher
 // @route POST /Teacher
@@ -115,32 +68,7 @@ const createNewTeacher = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc Update Teacher
-// @route PATCH /Teacher
-// @access Private
-const approveTeacher = asyncHandler(async (req, res) => {
-  const { id, roles } = req.body;
 
-  // Confirm Data
-  if ((!id, !roles)) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-  // Find Teacher
-  const teacher = await Teacher.findById(id).exec();
-  if (!teacher) {
-    return res.status(400).json({ message: "User not found" });
-  }
-
-  teacher.roles = roles;
-
-  // if (password) {
-  //   // Hash Pwd
-  //   teacher.password = await bcrypt.hash(password, 10);
-  // }
-  await teacher.save();
-
-  res.json({ message: "Teacher Approved" });
-});
 
 // @desc Delete Teacher
 // @route DELETE /Teacher
@@ -164,10 +92,8 @@ const deleteTeacher = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getTeacher,
-  getNewTeachers,
-  getTeacherList,
+  
   createNewTeacher,
-  approveTeacher,
+  
   deleteTeacher,
 };

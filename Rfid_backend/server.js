@@ -27,14 +27,10 @@ app.use("/", express.static("public"));
 app.use("/", require("./routes/root"));
 
 app.use("/auth", require("./routes/authRoutes"));
-app.use("/paper", require("./routes/paperRoutes"));
-app.use("/notes", require("./routes/notesRoutes"));
-app.use("/internal", require("./routes/internalRoutes"));
-app.use("/attendance", require("./routes/attendanceRoutes"));
-app.use("/time_schedule", require("./routes/timeScheduleRoutes"));
+
 app.use("/teacher", require("./routes/teacherRoutes"));
 app.use("/student", require("./routes/studentRoutes"));
-// app.use("/otp", require("./routes/studentRoutes"));
+
 app.use("/Hardware", require("./routes/HardwareRoutes"));
 app.use("/otp",require("./routes/otp"));
 app.use("/HardwareRoom",require("./routes/HardwareRoomRfidRoutes"));
