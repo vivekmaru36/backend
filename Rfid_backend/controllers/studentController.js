@@ -7,6 +7,8 @@ const { generateOTP } = require("./services/otp");
 const { sendOTP, sendResetMail } = require("./services/emailService");
 const Teacher = require("../models/Teacher");
 
+const HardwareRfidSwipe = require("../models/HardwareRfidSwipe")
+
 // @desc Get all Student
 // @route GET /Student
 // @access Private
@@ -70,7 +72,7 @@ const createNewStudent = asyncHandler(async (req, res) => {
     rfid,
     password: hashedPwd,
     Year: Year,
-    otp:OTP,
+    otp: OTP,
     isVerified: false
   };
 
@@ -145,10 +147,37 @@ const deleteStudent = asyncHandler(async (req, res) => {
   res.json({ message: `${result.username} deleted` });
 });
 
+
+// @desc GetAttendance
+// @route POST /getAttendance
+// @access Private
+const getAttendance = asyncHandler(async (req, res) => {
+  const { rfid } = req.body;
+  console.log(rfid)
+
+  // const document = await HardwareRfidSwipe.find({ rfid }, { geoLocation: 0, Ip: 0 }).lean().exec();
+  const attendance = await HardwareRfidSwipe.find({ rfid: rfid, hardwaredetails: { $ne: null } }, { geoLocation: 0, Ip: 0 })
+    .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
+    .lean()
+    .exec();
+
+    console.log("Attendance : ", attendance);
+
+    if (attendance) {
+      // If a document is found, send it as the response
+      return res.status(200).json({ attendance });
+  } else {
+      // If no document is found, send a 404 Not Found response
+      return res.status(404).json({ message: "No recent records found for the given RFID." });
+  }
+
+});
+
 module.exports = {
   getStudent,
   getAllStudents,
   createNewStudent,
   updateStudent,
   deleteStudent,
+  getAttendance
 };

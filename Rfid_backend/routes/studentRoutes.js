@@ -12,6 +12,8 @@ router
   .route("/")
   .get(studentController.getAllStudents)
   .post(studentController.createNewStudent);
+
+router.route("/getattendance").post(studentController.getAttendance);
  
 
 module.exports = router;
