@@ -11,4 +11,8 @@ router
   .route("/")
   .post(teacherController.createNewTeacher);
 
+router
+  .route("/:id")
+  .get(teacherController.getTeacher)
+
 module.exports = router;

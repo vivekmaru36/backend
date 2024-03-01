@@ -91,9 +91,25 @@ const deleteTeacher = asyncHandler(async (req, res) => {
   res.json({ message: `${result.username} deleted` });
 });
 
+// @desc Get Teacher
+// @route GET /teacher
+// @access Private
+const getTeacher = asyncHandler(async (req, res) => {
+  if (!req?.params?.id) return res.status(400).json({ message: "ID Missing" });
+
+  const teacher = await Teacher.findById(req.params.id)
+    .select("-password -_id -__v")
+    .lean();
+  if (!teacher) {
+    return res.status(404).json({ message: "No Teacher Found." });
+  }
+  res.json(teacher);
+});
+
 module.exports = {
   
   createNewTeacher,
   
   deleteTeacher,
+  getTeacher
 };
