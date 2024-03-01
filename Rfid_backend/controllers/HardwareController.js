@@ -101,9 +101,25 @@ const forceDeLec = asyncHandler(async (req, res) => {
     }
 });
 
+const AutoDel = asyncHandler(async (req, res) => {
+    const { etime } = req.body;
+    try {
+        // Check if the user is a teacher and present in hardware
+        const result = await Hardware.deleteMany({});
+        console.log(etime);
+        return res.status(200).json({ success: true, message: `All Hardware data deleted successfully.` });
+        
+        
+    } catch (error) {
+        console.error('Error deleting hardware data Automatically : ', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
 
 module.exports = {
     setLec,
     getLec,
-    forceDeLec
+    forceDeLec,
+    AutoDel
 };
