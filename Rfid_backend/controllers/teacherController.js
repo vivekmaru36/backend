@@ -32,9 +32,11 @@ const createNewTeacher = asyncHandler(async (req, res) => {
   // Check for Duplicates
   const duplicate = await Teacher.findOne({ rfid }).lean().exec();
   const duplicates = await Student.findOne({ rfid }).lean().exec();
+  const duplicateEmail = await Student.findOne({ email }).lean().exec();
+  const duplicateEmailT = await Teacher.findOne({ email }).lean().exec()
 
-  if (duplicate || duplicates) {
-    return res.status(409).json({ message: "RFid Already Registered" });
+  if (duplicate || duplicates || duplicateEmail || duplicateEmailT) {
+    return res.status(409).json({ message: "Rfid or Email Already Registered" });
   }
   const OTP = generateOTP();
   const emailRes = await sendOTP({ OTP, to: email });
