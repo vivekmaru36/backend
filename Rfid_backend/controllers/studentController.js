@@ -47,11 +47,13 @@ const createNewStudent = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  // Check for Duplicates
+  // Check for 
+  const duplicateEmail = await Student.findOne({ email }).lean().exec();
+  const duplicateEmailT = await Teacher.findOne({ email }).lean().exec();
   const duplicate = await Student.findOne({ rfid }).lean().exec();
   const duplicatet = await Teacher.findOne({ rfid }).lean().exec();
 
-  if (duplicate || duplicatet) {
+  if (duplicate || duplicatet||duplicateEmailT||duplicateEmail) {
     return res.status(409).json({ message: "Already Registered" });
   }
   const OTP = generateOTP();

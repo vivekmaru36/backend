@@ -10,6 +10,7 @@ const otp = asyncHandler(async (req, res) => {
    
       const student = await Student.findOne({ rfid }).lean().exec();
       const teacher = await Teacher.findOne({ rfid }).lean().exec();
+      // console.log("Real otp : ",student.otp)
       if (student && student.otp === otp) {
         await Student.updateOne({ rfid }, { $set: { isVerified: true } });
         return res.status(200).json({ success: true ,message:"Otp Verified Succesfull Please Login"});

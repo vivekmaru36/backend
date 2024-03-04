@@ -57,6 +57,8 @@ const studentLogin = asyncHandler(async (req, res) => {
   }
 
   const match = await bcrypt.compare(password, student.password);
+  // console.log('user sended :' ,password);
+  // console.log('decrypt :',student.password);
   if (!match) return res.status(401).json({ message: "Incorrect Password" });
 
 
