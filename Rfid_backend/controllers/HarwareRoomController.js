@@ -8,6 +8,8 @@ const axios = require('axios');
 
 const HardwareRfidSwipe = require("../models/HardwareRfidSwipe")
 
+const EntryGateModel = require("../models/EntryGateModel");
+
 const HardwareRFid = asyncHandler(async (req, res) => {
     const { rfid, geoLocation, Ip, ucurrentTime } = req.body;
     console.log(rfid)
@@ -15,7 +17,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
     console.log(Ip)
     console.log(ucurrentTime);
     const currentTttime = new Date();
-    console.log("Apna : ",currentTttime);
+    console.log("Apna : ", currentTttime);
 
     // Call the / endpoint to get hardware details
     let hardwaredetails;
@@ -49,7 +51,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 rfid,
                 geoLocation,
                 Ip,
-                currentTime : ucurrentTime,
+                currentTime: ucurrentTime,
                 foundInCollection: 'student',
                 details: student,
                 hardwaredetails: null
@@ -67,7 +69,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 rfid,
                 geoLocation,
                 Ip,
-                currentTime : ucurrentTime,
+                currentTime: ucurrentTime,
                 foundInCollection: 'teacher',
                 details: teacher,
                 hardwaredetails: null
@@ -85,7 +87,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 rfid,
                 geoLocation,
                 Ip,
-                currentTime : ucurrentTime,
+                currentTime: ucurrentTime,
                 foundInCollection: 'anonymous',
                 hardwaredetails: null
             }
@@ -109,7 +111,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                         rfid,
                         geoLocation,
                         Ip,
-                        currentTime : ucurrentTime,
+                        currentTime: ucurrentTime,
                         foundInCollection: 'Student',
                         details: student,
                         hardwaredetails: hardwaredetails,
@@ -129,7 +131,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                         rfid,
                         geoLocation,
                         Ip,
-                        currentTime : ucurrentTime,
+                        currentTime: ucurrentTime,
                         foundInCollection: 'Student',
                         details: student,
                         hardwaredetails: hardwaredetails,
@@ -151,7 +153,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                     rfid,
                     geoLocation,
                     Ip,
-                    currentTime : ucurrentTime,
+                    currentTime: ucurrentTime,
                     foundInCollection: 'Student',
                     details: student,
                     hardwaredetails: hardwaredetails,
@@ -174,7 +176,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                         rfid,
                         geoLocation,
                         Ip,
-                        currentTime : ucurrentTime,
+                        currentTime: ucurrentTime,
                         foundInCollection: 'Teacher',
                         details: teacher,
                         hardwaredetails: hardwaredetails,
@@ -194,7 +196,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                         rfid,
                         geoLocation,
                         Ip,
-                        currentTime : ucurrentTime,
+                        currentTime: ucurrentTime,
                         foundInCollection: 'Teacher',
                         details: teacher,
                         hardwaredetails: hardwaredetails,
@@ -216,7 +218,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                     rfid,
                     geoLocation,
                     Ip,
-                    currentTime : ucurrentTime,
+                    currentTime: ucurrentTime,
                     foundInCollection: 'Teacher',
                     details: teacher,
                     hardwaredetails: hardwaredetails,
@@ -235,7 +237,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 rfid,
                 geoLocation,
                 Ip,
-                currentTime : ucurrentTime,
+                currentTime: ucurrentTime,
                 foundInCollection: 'anonymous',
                 hardwaredetails: hardwaredetails
             }
@@ -250,6 +252,72 @@ const HardwareRFid = asyncHandler(async (req, res) => {
 
 });
 
+const EntryGate = asyncHandler(async (req, res) => {
+    const { rfid, geoLocation, Ip, ucurrentTime } = req.body;
+    console.log(rfid)
+    console.log(geoLocation)
+    console.log(Ip)
+    console.log(ucurrentTime);
+    const currentTttime = new Date();
+
+    const student = await Student.findOne({ rfid }).lean().exec();
+    const teacher = await Teacher.findOne({ rfid }).lean().exec();
+
+    if (student) {
+        console.log("Student and at Kc Gate");
+        const KcGateEntyrRfidSwipesObj = {
+            rfid,
+            geoLocation,
+            Ip,
+            currentTime: ucurrentTime,
+            foundInCollection: 'student',
+            details: student,
+        }
+        const KcGateSwipe = await EntryGateModel.create(KcGateEntyrRfidSwipesObj);
+
+        if (KcGateSwipe) {
+            res.status(201).json({ message: `New document created in EntryGate for student` });
+        } else {
+            res.status(400).json({ message: "Invalid data received For creating new doc in EntryGate" });
+        }
+    } else if (teacher) {
+        console.log("Teacher and at Kc Gate");
+        const KcGateEntyrRfidSwipesObj = {
+            rfid,
+            geoLocation,
+            Ip,
+            currentTime: ucurrentTime,
+            foundInCollection: 'teacher',
+            details: teacher,
+        }
+        const KcGateSwipe = await EntryGateModel.create(KcGateEntyrRfidSwipesObj);
+
+        if (KcGateSwipe) {
+            res.status(201).json({ message: `New document created in EntryGate for teacher` });
+        } else {
+            res.status(400).json({ message: "Invalid data received For creating new doc in EntryGate" });
+        }
+    } else {
+        console.log("Annonymous");
+        const KcGateEntyrRfidSwipesObj = {
+            rfid,
+            geoLocation,
+            Ip,
+            currentTime: ucurrentTime,
+            foundInCollection: 'anonymous',
+        }
+        const KcGateSwipe = await EntryGateModel.create(KcGateEntyrRfidSwipesObj);
+
+        if (KcGateSwipe) {
+            res.status(201).json({ message: `New document created in EntryGate for Anonymous` });
+        } else {
+            res.status(400).json({ message: "Invalid data received For creating new doc in EntryGate" });
+        }
+    }
+
+});
+
 module.exports = {
     HardwareRFid,
+    EntryGate
 };
