@@ -14,6 +14,7 @@ router
   .post(studentController.createNewStudent);
 
 router.route("/getattendance").post(studentController.getAttendance);
+router.route("/getAllLecs").post(studentController.getAllLecs);
  
 
 module.exports = router;

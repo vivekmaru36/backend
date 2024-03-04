@@ -7,7 +7,9 @@ const { generateOTP } = require("./services/otp");
 const { sendOTP, sendResetMail } = require("./services/emailService");
 const Teacher = require("../models/Teacher");
 
-const HardwareRfidSwipe = require("../models/HardwareRfidSwipe")
+const HardwareRfidSwipe = require("../models/HardwareRfidSwipe");
+
+const HardwareHistory=require("../models/HardwareHistory");
 
 // @desc Get all Student
 // @route GET /Student
@@ -176,11 +178,40 @@ const getAttendance = asyncHandler(async (req, res) => {
 
 });
 
+
+// @desc GetAttendance
+// @route POST /getAllLecs
+// @access Private
+const getAllLecs = asyncHandler(async (req, res) => {
+  const { rfid,course } = req.body;
+  console.log(rfid)
+  console.log(course)
+
+  // const document = await HardwareRfidSwipe.find({ rfid }, { geoLocation: 0, Ip: 0 }).lean().exec();
+  const AllLecs = await HardwareHistory.find({ course:course })
+    .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
+    .lean()
+    .exec();
+
+    console.log("AllLecs : ", AllLecs);
+
+    if (AllLecs) {
+      // If a document is found, send it as the response
+      return res.status(200).json({ AllLecs });
+  } else {
+      // If no document is found, send a 404 Not Found response
+      return res.status(404).json({ message: "No Lectures found" });
+  }
+
+});
+
+
 module.exports = {
   getStudent,
   getAllStudents,
   createNewStudent,
   updateStudent,
   deleteStudent,
-  getAttendance
+  getAttendance,
+  getAllLecs
 };
