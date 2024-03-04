@@ -16,7 +16,7 @@ const getStudent = asyncHandler(async (req, res) => {
   if (!req?.params?.id) return res.status(400).json({ message: "ID Missing" });
 
   const student = await Student.findById(req.params.id)
-    .select("-password -_id -__v")
+    .select("-password -otp -_id -__v")
     .exec();
   if (!student) {
     return res.status(400).json({ message: "Student Not Found." });
