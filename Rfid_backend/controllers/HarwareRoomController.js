@@ -63,7 +63,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
             const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
             if (hardwareswipe) {
                 res.status(201).json({ message: `New document created in HardwareRfidSwipe for student` });
-                const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'New document created in HardwareRfidSwipe for student' });
+                const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'New document created in HardwareRfidSwipe for student' });
             } else {
                 res.status(400).json({ message: "Invalid data received For creating new doc in HardwareRfidSwipe" });
             }
@@ -82,7 +82,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
             const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
             if (hardwareswipe) {
                 res.status(201).json({ message: `New document created in HardwareRfidSwipe for teacher` });
-                const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'New document created in HardwareRfidSwipe for teacher' });
+                const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: teacher.email, message: 'New document created in HardwareRfidSwipe for teacher' });
             } else {
                 res.status(400).json({ message: "Invalid data received For creating new doc in HardwareRfidSwipe" });
             }
@@ -126,11 +126,11 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                     const lookup = await HardwareRfidSwipe.findOne({ "hardwaredetails._id": hardwaredetails._id, "rfid": rfid });
                     if (lookup) {
                         res.status(400).json({ message: "Your attendance has been marked for this lecture" });
-                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'Your attendance has been marked Present for this lecture' });
+                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'Your attendance has been marked Present for this lecture' });
                     } else {
                         const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
                         res.status(201).json({ message: `Attendace marked Present for this lecture for student` });
-                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'Attendace marked Present for this lecture for student' });
+                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'Attendace marked Present for this lecture for student' });
                     }
                 }
                 else {
@@ -149,11 +149,11 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                     const lookup = await HardwareRfidSwipe.findOne({ "hardwaredetails._id": hardwaredetails._id, "rfid": rfid });
                     if (lookup) {
                         res.status(400).json({ message: "Your attendance has been marked for this lecture" });
-                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'Your attendance has been marked for this lecture' });
+                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'Your attendance has been marked for this lecture' });
                     } else {
                         const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
                         res.status(201).json({ message: `Attendace marked Absent for this lecture for student` });
-                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'Your attendance has been marked Absent for this lecture' });
+                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'Your attendance has been marked Absent for this lecture' });
                     }
                 }
             }
@@ -171,7 +171,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
                 if (hardwareswipe) {
                     res.status(201).json({ message: `New document created in HardwareRfidSwipe for student with hardware details` });
-                    const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'Your card has been swwiped but its not your lecture' });
+                    const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'Your card has been swwiped but its not your lecture' });
                 } else {
                     res.status(400).json({ message: "Invalid data received For creating new doc in HardwareRfidSwipe" });
                 }
@@ -196,11 +196,11 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                     const lookup = await HardwareRfidSwipe.findOne({ "hardwaredetails._id": hardwaredetails._id, "rfid": rfid });
                     if (lookup) {
                         res.status(400).json({ message: "Your attendance has been marked for this lecture" });
-                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'Your attendance has been already marked for this lecture' });
+                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: teacher.email, message: 'Your attendance has been already marked for this lecture' });
                     } else {
                         const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
                         res.status(201).json({ message: `Attendace marked Present for this lecture for Teacher` });
-                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'Your attendance has been marked Present for this lecture' });
+                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: teacher.email, message: 'Your attendance has been marked Present for this lecture' });
                     }
                 }
                 else {
@@ -219,11 +219,11 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                     const lookup = await HardwareRfidSwipe.findOne({ "hardwaredetails._id": hardwaredetails._id, "rfid": rfid });
                     if (lookup) {
                         res.status(400).json({ message: "Your attendance has been marked for this lecture" });
-                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'Your attendance has been marked for this lecture' });
+                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: teacher.email, message: 'Your attendance has been marked for this lecture' });
                     } else {
                         const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
                         res.status(201).json({ message: `Attendace marked Absent for this lecture for teacher` });
-                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: email, message: 'Your attendance has been marked Absent for this lecture' });
+                        const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: teacher.email, message: 'Your attendance has been marked Absent for this lecture' });
                     }
                 }
             }
@@ -241,7 +241,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
                 if (hardwareswipe) {
                     res.status(201).json({ message: `New document created in HardwareRfidSwipe for teacher with hardware details` });
-                    res.status(201).json({ message: `Your card was swipped but its not your lecture` });
+                    const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: teacher.email, message: 'Card Swpped but no your lecture' });
                 } else {
                     res.status(400).json({ message: "Invalid data received For creating new doc in HardwareRfidSwipe" });
                 }
