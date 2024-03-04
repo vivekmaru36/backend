@@ -154,11 +154,12 @@ const deleteStudent = asyncHandler(async (req, res) => {
 // @route POST /getAttendance
 // @access Private
 const getAttendance = asyncHandler(async (req, res) => {
-  const { rfid } = req.body;
+  const { rfid,course } = req.body;
   console.log(rfid)
+  console.log(course)
 
   // const document = await HardwareRfidSwipe.find({ rfid }, { geoLocation: 0, Ip: 0 }).lean().exec();
-  const attendance = await HardwareRfidSwipe.find({ rfid: rfid, hardwaredetails: { $ne: null } }, { geoLocation: 0, Ip: 0 })
+  const attendance = await HardwareRfidSwipe.find({ rfid: rfid, hardwaredetails: { $ne: null },'hardwaredetails.course':course }, { geoLocation: 0, Ip: 0 })
     .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
     .lean()
     .exec();

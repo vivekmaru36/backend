@@ -36,7 +36,8 @@ const teacherLogin = asyncHandler(async (req, res) => {
       name: teacher.name,
       role: teacher.role,
       course: teacher.course,
-      rfid: teacher.rfid
+      rfid: teacher.rfid,
+      email:teacher.email
     });
   }
 });
@@ -74,7 +75,9 @@ const studentLogin = asyncHandler(async (req, res) => {
       _id: student.id,
       name: student.name,
       role: "student",
-      rfid : student.rfid
+      rfid : student.rfid,
+      course:student.course,
+      email:student.email
     });
   }
 });

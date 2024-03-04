@@ -3,8 +3,10 @@ const Teacher = require("../models/Teacher");
 const Hardware = require("../models/Hardware");
 const HardwaresHistorySchema = require("../models/HardwareHistory")
 
+const { sendLecSetMail } = require("./services/emailService");
+
 const setLec = asyncHandler(async (req, res) => {
-    const { Teacher, Subject, stime, etime, date, rfidno, course } = req.body;
+    const { Teacher, Subject, stime, etime, date, rfidno, course,email } = req.body;
 
     // console.log(Teacher);
     // console.log(Subject);
@@ -54,6 +56,8 @@ const setLec = asyncHandler(async (req, res) => {
 
     if (Lecdetails) {
         res.status(201).json({ message: `New Lec created by ${Teacher} in Hardware Lab` });
+        const emailsend = await sendLecSetMail({ lecdetails:HardwareObj, to:email });
+
     } else {
         res.status(400).json({ message: "Invalid data received For Setting Lec Details" });
     }

@@ -1,21 +1,50 @@
 const MAIL_SETTINGS = {
-    service: "gmail",
-    auth: {
-      user: "group14rfid@gmail.com",
-      pass: "hucwoikawijavyil",
-    },
+  service: "gmail",
+  auth: {
+    user: "group14rfid@gmail.com",
+    pass: "hucwoikawijavyil",
+  },
+};
+
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport(MAIL_SETTINGS);
+
+
+// function of date conversion
+
+function convertToIST12HourFormatWithDate(timestampString) {
+  // Parse the input timestamp string
+  const timestampUTC = new Date(timestampString);
+
+  console.log(timestampUTC);
+
+  // // Set the time zone to Indian Standard Time (IST)
+  // timestampUTC.setUTCHours(timestampUTC.getUTCHours() + 5);
+  // timestampUTC.setUTCMinutes(timestampUTC.getUTCMinutes() + 30);
+
+  // Format the date and time in 12-hour format with AM/PM
+  const options = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'short',
+    minute: 'short',
+    second: 'short',
+    hour12: true,
   };
-  
-  const nodemailer = require("nodemailer");
-  const transporter = nodemailer.createTransport(MAIL_SETTINGS);
-  
-  module.exports.sendOTP = async (params) => {
-    try {
-      let info = await transporter.sendMail({
-        from: MAIL_SETTINGS.auth.user,
-        to: params.to,
-        subject: "Hello 👋",
-        html: `
+  const istTime12HourFormatWithDate = timestampUTC.toLocaleString('en-US',);
+
+  return istTime12HourFormatWithDate;
+}
+
+module.exports.sendOTP = async (params) => {
+  try {
+    let info = await transporter.sendMail({
+      from: MAIL_SETTINGS.auth.user,
+      to: params.to,
+      subject: "Hello 👋",
+      html: `
         <div
           class="container"
           style="max-width: 90%; margin: auto; padding-top: 20px"
@@ -25,21 +54,21 @@ const MAIL_SETTINGS = {
           <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center;">${params.OTP}</h1>
         </div>
       `,
-      });
-      return info;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  };
-  
-  module.exports.sendResetMail = async (params) => {
-    try {
-      let info = await transporter.sendMail({
-        from: MAIL_SETTINGS.auth.user,
-        to: params.to,
-        subject: `Hello `,
-        html: `
+    });
+    return info;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+module.exports.sendResetMail = async (params) => {
+  try {
+    let info = await transporter.sendMail({
+      from: MAIL_SETTINGS.auth.user,
+      to: params.to,
+      subject: `Hello `,
+      html: `
         <div
           class="container"
           style="max-width: 90%; margin: auto; padding-top: 20px"
@@ -47,10 +76,33 @@ const MAIL_SETTINGS = {
           <h2>Verify OTP.</h2>
      </div>
       `,
-      });
-      return info;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  };
+    });
+    return info;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+
+module.exports.sendLecSetMail = async (params) => {
+  try {
+    let info = await transporter.sendMail({
+      from: MAIL_SETTINGS.auth.user,
+      to: params.to,
+      subject: `Hello You have setted lecture in Hardware Lab on ${convertToIST12HourFormatWithDate(params.lecdetails.Lecdate)} `,
+      html: `
+        <div
+          class="container"
+          style="max-width: 90%; margin: auto; padding-top: 20px"
+        >
+          <h2>Your Lecture has been allotted in hardware lab</h2>
+     </div>
+      `,
+    });
+    return info;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
