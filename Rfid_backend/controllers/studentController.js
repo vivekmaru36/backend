@@ -49,6 +49,18 @@ const createNewStudent = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
 
+  // name check
+  const nameRegex = /[a-zA-Z]+$/;
+  if (!nameRegex.test(name.trim())) {
+    return res.status(400).json({ message: "Name Should contain only letters" });
+  }
+
+  // email check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim())) {
+    return res.status(400).json({ message: "Invalid Email format" });    
+  }
+
   // Check for 
   const duplicateEmail = await Student.findOne({ email }).lean().exec();
   const duplicateEmailT = await Teacher.findOne({ email }).lean().exec();
