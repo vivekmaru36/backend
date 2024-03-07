@@ -5,7 +5,7 @@ const Student = require("./../models/Student");
 const Teacher = require("../models/Teacher");
 const axios = require('axios');
 
-const { sendRfidSwipeMail } = require("./services/emailService");
+const { sendRfidSwipeMail, sendRfidSwipeMail2 } = require("./services/emailService");
 
 
 
@@ -292,7 +292,7 @@ const EntryGate = asyncHandler(async (req, res) => {
 
         if (KcGateSwipe) {
             res.status(201).json({ message: `New document created in EntryGate for student` });
-            const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'You were preesent at kc gate' });
+            const emailsend2 = await sendRfidSwipeMail2({ details: ucurrentTime, to: student.email, message: 'You were preesent at kc gate' });
         } else {
             res.status(400).json({ message: "Invalid data received For creating new doc in EntryGate" });
         }
@@ -310,7 +310,7 @@ const EntryGate = asyncHandler(async (req, res) => {
 
         if (KcGateSwipe) {
             res.status(201).json({ message: `New document created in EntryGate for teacher` });
-            const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: teacher.email, message: 'You were Present at Kc gate' });
+            const emailsend2 = await sendRfidSwipeMail2({ details: ucurrentTime, to: teacher.email, message: 'You were Present at Kc gate' });
         } else {
             res.status(400).json({ message: "Invalid data received For creating new doc in EntryGate" });
         }
