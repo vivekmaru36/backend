@@ -2,7 +2,8 @@ const asyncHandler = require("express-async-handler");
 const axios = require('axios');
 
 const HardwareRfidSwipe = require("../models/HardwareRfidSwipe")
-const HardwareHistory = require("../models/HardwareHistory")
+const HardwareHistory = require("../models/HardwareHistory");
+const Student = require("../models/Student");
 
 const TotalLec = asyncHandler(async (req, res) => {
     const { rfid } = req.body;
@@ -48,7 +49,42 @@ const ids = asyncHandler(async (req, res) => {
 
 });
 
+const StudentInYourCourse = asyncHandler(async (req, res) => {
+    const { rfid,course } = req.body;
+    console.log(rfid);
+    console.log(course);
+
+    const studentsFirstYear = await Student.find({ course: course, Year: '1st' })
+        .select('-password -otp -isVerified')
+        .lean()
+        .exec();
+
+    console.log("Document for first year students: ", studentsFirstYear);
+
+    const studentsSecondYear = await Student.find({ course: course, Year: '2nd' })
+        .select('-password -otp -isVerified')
+        .lean()
+        .exec();
+
+    console.log("Document for second year students: ", studentsSecondYear);
+
+    const studentsThirdYear = await Student.find({ course: course, Year: '3rd' })
+        .select('-password -otp -isVerified')
+        .lean()
+        .exec();
+
+    console.log("Document for third year students: ", studentsThirdYear);
+
+    // console.log("Document for total students : ", Totalstudents);
+    return res.status(200).json({
+        studentsFirstYear,
+        studentsSecondYear,
+        studentsThirdYear
+    });
+});
+
 module.exports = {
     TotalLec,
-    ids
+    ids,
+    StudentInYourCourse
 };

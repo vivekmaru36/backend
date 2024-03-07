@@ -16,14 +16,14 @@ const RecentRecordsoOnRfid = asyncHandler(async (req, res) => {
         .lean()
         .exec();
 
-    console.log("Document 1 : ", document);
+    // console.log("Document 1 : ", document);
 
     const document2 = await EntryGateModel.find({ rfid }, { geoLocation: 0, Ip: 0 })
         .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
         .lean()
         .exec();
     
-    console.log("Document 2 : ", document2);
+    // console.log("Document 2 : ", document2);
 
     // Combine both document1 and document2 arrays into a single array
     const document3 = [...document, ...document2]
@@ -31,7 +31,7 @@ const RecentRecordsoOnRfid = asyncHandler(async (req, res) => {
     // Sort the combined array based on currentTime in descending order
     document3.sort((a, b) => new Date(b.currentTime) - new Date(a.currentTime));
 
-    console.log("Document 3 : ", document3);
+    // console.log("Document 3 : ", document3);
 
     // if (document) {
     //     // If a document is found, send it as the response
