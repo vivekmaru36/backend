@@ -1,6 +1,26 @@
 const TimeSchedule = require("./../models/TimeSchedule");
 const asyncHandler = require("express-async-handler");
 
+
+// @desc Get TimeSchedule for everyone
+// @route GET /TimeSchedulefor everyone
+// @access Everyone
+const getTimeScheduleE = async (req, res) => {
+
+
+  const timeSchedule = await TimeSchedule.findOne({ rfid: '3424265225' })
+    .select({ 'schedule._id': 0 }) // Exclude the _id field inside the schedule object
+    .exec();
+
+  if (!timeSchedule) {
+    return res.status(404).json({
+      message: `Time Schedule not found`,
+    });
+  }
+  console.log(timeSchedule);
+  res.json(timeSchedule);
+};
+
 // @desc Get TimeSchedule for each Teacher
 // @route GET /TimeSchedule
 // @access Everyone
@@ -23,10 +43,10 @@ const getTimeSchedule = async (req, res) => {
 // @route POST /time_Schedule
 // @access Private
 const addTimeSchedule = asyncHandler(async (req, res) => {
-  const { teacher, schedule,date } = req.body;
+  const { teacher, schedule, date, rfid } = req.body;
 
   // Confirm Data
-  if (!teacher || !schedule ||!date) {
+  if (!teacher || !schedule || !date) {
     return res
       .status(400)
       .json({ message: "Incomplete Request: Fields Missing" });
@@ -46,7 +66,8 @@ const addTimeSchedule = asyncHandler(async (req, res) => {
   const TimeScheduleObj = {
     teacher,
     schedule,
-    sdate:date
+    sdate: date,
+    rfid: rfid
   };
 
   // Create and Store New Time Schedule
@@ -122,4 +143,5 @@ module.exports = {
   addTimeSchedule,
   updateTimeSchedule,
   deleteTimeSchedule,
+  getTimeScheduleE
 };

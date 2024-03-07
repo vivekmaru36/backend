@@ -49,6 +49,9 @@ const timeScheduleSchema = new mongoose.Schema({
   schedule: daySchema,
   sdate: {
     type:Date
+  },
+  rfid: {
+    type:String
   }
 });
 
