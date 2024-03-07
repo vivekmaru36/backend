@@ -47,6 +47,9 @@ const timeScheduleSchema = new mongoose.Schema({
     ref: "Teacher",
   },
   schedule: daySchema,
+  sdate: {
+    type:Date
+  }
 });
 
 module.exports = mongoose.model("Time_Schedule", timeScheduleSchema);

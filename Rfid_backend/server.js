@@ -36,6 +36,7 @@ app.use("/otp",require("./routes/otp"));
 app.use("/HardwareRoom",require("./routes/HardwareRoomRfidRoutes"));
 app.use("/RecentRecords",require("./routes/RecentRecordsRoutes"));
 app.use("/LecHistory",require("./routes/LecHistoryRoutes"));
+app.use("/time_schedule", require("./routes/TimeScheduleRoutes"));
 
 app.all("*", (req, res) => {
   res.status(404);

@@ -23,10 +23,10 @@ const getTimeSchedule = async (req, res) => {
 // @route POST /time_Schedule
 // @access Private
 const addTimeSchedule = asyncHandler(async (req, res) => {
-  const { teacher, schedule } = req.body;
+  const { teacher, schedule,date } = req.body;
 
   // Confirm Data
-  if (!teacher || !schedule) {
+  if (!teacher || !schedule ||!date) {
     return res
       .status(400)
       .json({ message: "Incomplete Request: Fields Missing" });
@@ -46,6 +46,7 @@ const addTimeSchedule = asyncHandler(async (req, res) => {
   const TimeScheduleObj = {
     teacher,
     schedule,
+    sdate:date
   };
 
   // Create and Store New Time Schedule
