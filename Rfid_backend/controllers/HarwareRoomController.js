@@ -5,7 +5,7 @@ const Student = require("./../models/Student");
 const Teacher = require("../models/Teacher");
 const axios = require('axios');
 
-const { sendRfidSwipeMail, sendRfidSwipeMail2, sendRfidSwipeMail3 } = require("./services/emailService");
+const { sendRfidSwipeMail, sendRfidSwipeMail2, sendRfidSwipeMail3, sendRfidSwipeMail4 } = require("./services/emailService");
 
 
 
@@ -13,6 +13,7 @@ const HardwareRfidSwipe = require("../models/HardwareRfidSwipe")
 
 const EntryGateModel = require("../models/EntryGateModel");
 const LibraryModel = require("../models/LibraryModel");
+const AuditoriumModel = require("../models/AuditoriumModel");
 
 const HardwareRFid = asyncHandler(async (req, res) => {
     const { rfid, geoLocation, Ip, ucurrentTime } = req.body;
@@ -402,8 +403,76 @@ const Library = asyncHandler(async (req, res) => {
 
 });
 
+const Auditorium = asyncHandler(async (req, res) => {
+    const { rfid, geoLocation, Ip, ucurrentTime } = req.body;
+    console.log(rfid)
+    console.log(geoLocation)
+    console.log(Ip)
+    console.log(ucurrentTime);
+    const currentTttime = new Date();
+
+    const student = await Student.findOne({ rfid }).lean().exec();
+    const teacher = await Teacher.findOne({ rfid }).lean().exec();
+
+    if (student) {
+        console.log("Student and at Auditorium");
+        const AuditoriumRfidSwipesObj = {
+            rfid,
+            geoLocation,
+            Ip,
+            currentTime: ucurrentTime,
+            foundInCollection: 'student',
+            details: student,
+        }
+        const AuditoriumSwipe = await AuditoriumModel.create(AuditoriumRfidSwipesObj);
+
+        if (AuditoriumSwipe) {
+            res.status(201).json({ message: `New document created in Auditorium for student` });
+            const emailsend2 = await sendRfidSwipeMail4({ details: ucurrentTime, to: student.email, message: 'You were present at Auditorium' });
+        } else {
+            res.status(400).json({ message: "Invalid data received For creating new doc in Auditorium" });
+        }
+    } else if (teacher) {
+        console.log("Teacher and at Auditorium");
+        const AuditoriumRfidSwipesObj = {
+            rfid,
+            geoLocation,
+            Ip,
+            currentTime: ucurrentTime,
+            foundInCollection: 'teacher',
+            details: teacher,
+        }
+        const AuditoriumSwipe  = await AuditoriumModel.create(AuditoriumRfidSwipesObj);
+
+        if (AuditoriumSwipe) {
+            res.status(201).json({ message: `New document created in Auditorium for teacher` });
+            const emailsend2 = await sendRfidSwipeMail4({ details: ucurrentTime, to: teacher.email, message: 'You were Present at Auditorium' });
+        } else {
+            res.status(400).json({ message: "Invalid data received For creating new doc in Auditorium" });
+        }
+    } else {
+        console.log("Annonymous");
+        const AuditoriumRfidSwipesObj = {
+            rfid,
+            geoLocation,
+            Ip,
+            currentTime: ucurrentTime,
+            foundInCollection: 'anonymous',
+        }
+        const AuditoriumSwipe = await AuditoriumModel.create(AuditoriumRfidSwipesObj);
+
+        if (AuditoriumSwipe) {
+            res.status(201).json({ message: `New document created in Auditorium for Anonymous` });
+        } else {
+            res.status(400).json({ message: "Invalid data received For creating new doc in Auditorium" });
+        }
+    }
+
+});
+
 module.exports = {
     HardwareRFid,
     EntryGate,
-    Library
+    Library,
+    Auditorium
 };

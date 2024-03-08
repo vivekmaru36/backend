@@ -5,6 +5,7 @@ const axios = require('axios');
 const HardwareRfidSwipe = require("../models/HardwareRfidSwipe");
 const EntryGateModel = require("../models/EntryGateModel");
 const LibraryModel = require("../models/LibraryModel");
+const AuditoriumModel = require("../models/AuditoriumModel");
 
 
 const RecentRecordsoOnRfid = asyncHandler(async (req, res) => {
@@ -32,8 +33,13 @@ const RecentRecordsoOnRfid = asyncHandler(async (req, res) => {
         .exec();
 
     // console.log(library)
+
+    const Auditorium = await AuditoriumModel.find({ rfid }, { geoLocation: 0, Ip: 0 })
+        .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
+        .lean()
+        .exec();
     // Combine both document1 and document2 arrays into a single array
-    const document3 = [...document, ...document2, ...library]
+    const document3 = [...document, ...document2, ...library, ...Auditorium]
 
     // Sort the combined array based on currentTime in descending order
     document3.sort((a, b) => new Date(b.currentTime) - new Date(a.currentTime));
