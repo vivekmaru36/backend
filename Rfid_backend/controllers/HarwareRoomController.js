@@ -24,6 +24,12 @@ const HardwareRFid = asyncHandler(async (req, res) => {
     const currentTttime = new Date();
     console.log("Apna : ", currentTttime);
 
+    // const ipcheck = "Your ip here";
+    // const geocheck = "Your geo location here";
+    // if (ipcheck!==Ip && geocheck!==geoLocation){
+    //     res.status(400).json({ message: "Request came from somewhere else" });
+    // }
+
     // Call the / endpoint to get hardware details
     let hardwaredetails;
     try {
