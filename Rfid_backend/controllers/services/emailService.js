@@ -151,3 +151,25 @@ module.exports.sendRfidSwipeMail2 = async (params) => {
     return false;
   }
 };
+
+module.exports.sendRfidSwipeMail3 = async (params) => {
+  try {
+    let info = await transporter.sendMail({
+      from: MAIL_SETTINGS.auth.user,
+      to: params.to,
+      subject: `Hello You have swiped Rfid in Library on ${convertToIST12HourFormatWithDate(params.details)} `,
+      html: `
+        <div
+          class="container"
+          style="max-width: 90%; margin: auto; padding-top: 20px"
+        >
+          <h2>You swipped rfid and ${params.message}</h2>
+     </div>
+      `,
+    });
+    return info;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};

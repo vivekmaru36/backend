@@ -5,13 +5,14 @@ const Student = require("./../models/Student");
 const Teacher = require("../models/Teacher");
 const axios = require('axios');
 
-const { sendRfidSwipeMail, sendRfidSwipeMail2 } = require("./services/emailService");
+const { sendRfidSwipeMail, sendRfidSwipeMail2, sendRfidSwipeMail3 } = require("./services/emailService");
 
 
 
 const HardwareRfidSwipe = require("../models/HardwareRfidSwipe")
 
 const EntryGateModel = require("../models/EntryGateModel");
+const LibraryModel = require("../models/LibraryModel");
 
 const HardwareRFid = asyncHandler(async (req, res) => {
     const { rfid, geoLocation, Ip, ucurrentTime } = req.body;
@@ -334,7 +335,75 @@ const EntryGate = asyncHandler(async (req, res) => {
 
 });
 
+const Library = asyncHandler(async (req, res) => {
+    const { rfid, geoLocation, Ip, ucurrentTime } = req.body;
+    console.log(rfid)
+    console.log(geoLocation)
+    console.log(Ip)
+    console.log(ucurrentTime);
+    const currentTttime = new Date();
+
+    const student = await Student.findOne({ rfid }).lean().exec();
+    const teacher = await Teacher.findOne({ rfid }).lean().exec();
+
+    if (student) {
+        console.log("Student and at Library");
+        const LibraryRfidSwipesObj = {
+            rfid,
+            geoLocation,
+            Ip,
+            currentTime: ucurrentTime,
+            foundInCollection: 'student',
+            details: student,
+        }
+        const LibrarySwipe = await LibraryModel.create(LibraryRfidSwipesObj);
+
+        if (LibrarySwipe) {
+            res.status(201).json({ message: `New document created in library for student` });
+            const emailsend2 = await sendRfidSwipeMail3({ details: ucurrentTime, to: student.email, message: 'You were present at Library' });
+        } else {
+            res.status(400).json({ message: "Invalid data received For creating new doc in library" });
+        }
+    } else if (teacher) {
+        console.log("Teacher and at Kc Gate");
+        const LibraryRfidSwipesObj = {
+            rfid,
+            geoLocation,
+            Ip,
+            currentTime: ucurrentTime,
+            foundInCollection: 'teacher',
+            details: teacher,
+        }
+        const LibrarySwipe = await LibraryModel.create(LibraryRfidSwipesObj);
+
+        if (LibrarySwipe) {
+            res.status(201).json({ message: `New document created in library for teacher` });
+            const emailsend2 = await sendRfidSwipeMail3({ details: ucurrentTime, to: teacher.email, message: 'You were Present at Library' });
+        } else {
+            res.status(400).json({ message: "Invalid data received For creating new doc in Library" });
+        }
+    } else {
+        console.log("Annonymous");
+        const  LibraryRfidSwipesObj= {
+            rfid,
+            geoLocation,
+            Ip,
+            currentTime: ucurrentTime,
+            foundInCollection: 'anonymous',
+        }
+        const LibrarySwipe = await LibraryModel.create(LibraryRfidSwipesObj);
+
+        if (LibrarySwipe) {
+            res.status(201).json({ message: `New document created in Library for Anonymous` });
+        } else {
+            res.status(400).json({ message: "Invalid data received For creating new doc in Library" });
+        }
+    }
+
+});
+
 module.exports = {
     HardwareRFid,
-    EntryGate
+    EntryGate,
+    Library
 };
