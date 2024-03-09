@@ -38,6 +38,10 @@ const Hardwareschema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    Year: {
+        type: String,
+        required: true,
+    },
 });
 
 module.exports = mongoose.model("Hardware", Hardwareschema);

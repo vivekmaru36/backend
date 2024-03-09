@@ -6,7 +6,7 @@ const HardwaresHistorySchema = require("../models/HardwareHistory")
 const { sendLecSetMail } = require("./services/emailService");
 
 const setLec = asyncHandler(async (req, res) => {
-    const { Teacher, Subject, stime, etime, date, rfidno, course,email } = req.body;
+    const { Teacher, Subject, stime, etime, date, rfidno, course,email,Year } = req.body;
 
     // console.log(Teacher);
     // console.log(Subject);
@@ -33,7 +33,8 @@ const setLec = asyncHandler(async (req, res) => {
         sTime, // Use converted Date object
         eTime, // Use converted Date object
         rfidno,
-        course
+        course,
+        Year
     };
 
     const existingDocument = await Hardware.findOne();

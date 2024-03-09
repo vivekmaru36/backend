@@ -38,6 +38,10 @@ const HardwaresHistorySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    Year: {
+        type: String,
+        required: true,
+    }
 });
 
 module.exports = mongoose.model("HardwaresHistorySchema", HardwaresHistorySchema);

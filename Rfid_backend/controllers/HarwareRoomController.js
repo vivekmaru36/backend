@@ -116,7 +116,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
         console.log("hardware details there")
         if (student) {
             console.log("student and hardware");
-            if (student.course === hardwaredetails.course) {
+            if (student.course === hardwaredetails.course && student.Year===hardwaredetails.Year) {
                 // console.log("Yes 1st")
                 if (ucurrentTime >= hardwaredetails.sTime && ucurrentTime <= hardwaredetails.eTime) {
                     // console.log("Yes 2nd")

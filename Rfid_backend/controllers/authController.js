@@ -77,7 +77,8 @@ const studentLogin = asyncHandler(async (req, res) => {
       role: "student",
       rfid : student.rfid,
       course:student.course,
-      email:student.email
+      email:student.email,
+      Year:student.Year
     });
   }
 });
