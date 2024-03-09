@@ -9,7 +9,7 @@ const Teacher = require("../models/Teacher");
 
 const HardwareRfidSwipe = require("../models/HardwareRfidSwipe");
 
-const HardwareHistory=require("../models/HardwareHistory");
+const HardwareHistory = require("../models/HardwareHistory");
 
 // @desc Get all Student
 // @route GET /Student
@@ -58,7 +58,7 @@ const createNewStudent = asyncHandler(async (req, res) => {
   // email check
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.trim())) {
-    return res.status(400).json({ message: "Invalid Email format" });    
+    return res.status(400).json({ message: "Invalid Email format" });
   }
 
   // Check for 
@@ -67,7 +67,7 @@ const createNewStudent = asyncHandler(async (req, res) => {
   const duplicate = await Student.findOne({ rfid }).lean().exec();
   const duplicatet = await Teacher.findOne({ rfid }).lean().exec();
 
-  if (duplicate || duplicatet||duplicateEmailT||duplicateEmail) {
+  if (duplicate || duplicatet || duplicateEmailT || duplicateEmail) {
     return res.status(409).json({ message: "Already Registered" });
   }
   const OTP = generateOTP();
@@ -168,24 +168,57 @@ const deleteStudent = asyncHandler(async (req, res) => {
 // @route POST /getAttendance
 // @access Private
 const getAttendance = asyncHandler(async (req, res) => {
-  const { rfid,course,Year } = req.body;
+  const { rfid, course, Year } = req.body;
   console.log(rfid)
   console.log(course)
 
-  // const document = await HardwareRfidSwipe.find({ rfid }, { geoLocation: 0, Ip: 0 }).lean().exec();
-  const attendance = await HardwareRfidSwipe.find({ rfid: rfid, hardwaredetails: { $ne: null },'hardwaredetails.course':course,'hardwaredetails.Year':Year }, { geoLocation: 0, Ip: 0 })
+  const AllLecs = await HardwareHistory.find({ course: course, Year: Year })
     .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
     .lean()
     .exec();
 
-    console.log("Attendance : ", attendance);
+  console.log("AllLecs : ", AllLecs);
 
-    if (attendance) {
-      // If a document is found, send it as the response
-      return res.status(200).json({ attendance });
+  const CountAllLecs = await HardwareHistory.countDocuments({ course: course, Year: Year })
+    .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
+    .lean()
+    .exec();
+
+  // const document = await HardwareRfidSwipe.find({ rfid }, { geoLocation: 0, Ip: 0 }).lean().exec();
+  const attendance = await HardwareRfidSwipe.find({ rfid: rfid, hardwaredetails: { $ne: null }, 'hardwaredetails.course': course, 'hardwaredetails.Year': Year }, { geoLocation: 0, Ip: 0 })
+    .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
+    .lean()
+    .exec();
+
+  const countA = await HardwareRfidSwipe.countDocuments({ rfid: rfid, hardwaredetails: { $ne: null }, 'hardwaredetails.course': course, 'hardwaredetails.Year': Year }, { geoLocation: 0, Ip: 0 })
+    .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
+    .lean()
+    .exec();
+
+  console.log("Attendance : ", attendance);
+  console.log("Total Count of Attendance : ", countA);
+
+  // yaha
+
+  // Create a new array to store total lectures with attendance status
+  const lecturesWithAttendance = AllLecs.map(lec => {
+    console.log("AllLecs sTime:", AllLecs.map(lec => lec.sTime));
+    console.log("Attendance sTime:", attendance.map(att => att.hardwaredetails.sTime));
+    const foundAttendance = attendance.find(att => att.hardwaredetails.sTime   === lec.sTime.toISOString());
+    return {
+      ...lec,
+      attendance: foundAttendance ? foundAttendance.attendance : 'Absent'
+    };
+  });
+
+  console.log("Damn : ",lecturesWithAttendance);
+
+  if (lecturesWithAttendance) {
+    // If a document is found, send it as the response
+    return res.status(200).json({ lecturesWithAttendance, countA });
   } else {
-      // If no document is found, send a 404 Not Found response
-      return res.status(404).json({ message: "No recent records found for the given RFID." });
+    // If no document is found, send a 404 Not Found response
+    return res.status(404).json({ message: "No recent records found for the given RFID." });
   }
 
 });
@@ -195,24 +228,31 @@ const getAttendance = asyncHandler(async (req, res) => {
 // @route POST /getAllLecs
 // @access Private
 const getAllLecs = asyncHandler(async (req, res) => {
-  const { rfid,course,Year } = req.body;
+  const { rfid, course, Year } = req.body;
   console.log(rfid)
   console.log(course)
 
   // const document = await HardwareRfidSwipe.find({ rfid }, { geoLocation: 0, Ip: 0 }).lean().exec();
-  const AllLecs = await HardwareHistory.find({ course:course,Year:Year })
+  const AllLecs = await HardwareHistory.find({ course: course, Year: Year })
     .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
     .lean()
     .exec();
 
-    console.log("AllLecs : ", AllLecs);
+  console.log("AllLecs : ", AllLecs);
 
-    if (AllLecs) {
-      // If a document is found, send it as the response
-      return res.status(200).json({ AllLecs });
+  const CountAllLecs = await HardwareHistory.countDocuments({ course: course, Year: Year })
+    .sort({ currentTime: -1 }) // 1 for ascending order, -1 for descending order
+    .lean()
+    .exec();
+
+  console.log("CountAllLecs : ", CountAllLecs);
+
+  if (AllLecs) {
+    // If a document is found, send it as the response
+    return res.status(200).json({ AllLecs, CountAllLecs });
   } else {
-      // If no document is found, send a 404 Not Found response
-      return res.status(404).json({ message: "No Lectures found" });
+    // If no document is found, send a 404 Not Found response
+    return res.status(404).json({ message: "No Lectures found" });
   }
 
 });
