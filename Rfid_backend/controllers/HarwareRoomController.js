@@ -116,7 +116,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
         console.log("hardware details there")
         if (student) {
             console.log("student and hardware");
-            if (student.course === hardwaredetails.course && student.Year===hardwaredetails.Year) {
+            if (student.course === hardwaredetails.course && student.Year === hardwaredetails.Year) {
                 // console.log("Yes 1st")
                 if (ucurrentTime >= hardwaredetails.sTime && ucurrentTime <= hardwaredetails.eTime) {
                     // console.log("Yes 2nd")
@@ -132,7 +132,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                     }
                     // lookup for same insertion
                     const lookup = await HardwareRfidSwipe.findOne({ "hardwaredetails._id": hardwaredetails._id, "rfid": rfid });
-                    if (lookup) {
+                    if (lookup && !(ucurrentTime >= hardwaredetails.sTime && ucurrentTime <= hardwaredetails.eTime)) {
                         res.status(400).json({ message: "Your attendance has been marked for this lecture" });
                         const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'Your attendance has been marked Present for this lecture' });
                     } else {
@@ -391,7 +391,7 @@ const Library = asyncHandler(async (req, res) => {
         }
     } else {
         console.log("Annonymous");
-        const  LibraryRfidSwipesObj= {
+        const LibraryRfidSwipesObj = {
             rfid,
             geoLocation,
             Ip,
@@ -448,7 +448,7 @@ const Auditorium = asyncHandler(async (req, res) => {
             foundInCollection: 'teacher',
             details: teacher,
         }
-        const AuditoriumSwipe  = await AuditoriumModel.create(AuditoriumRfidSwipesObj);
+        const AuditoriumSwipe = await AuditoriumModel.create(AuditoriumRfidSwipesObj);
 
         if (AuditoriumSwipe) {
             res.status(201).json({ message: `New document created in Auditorium for teacher` });
