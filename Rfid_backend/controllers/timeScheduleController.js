@@ -8,7 +8,7 @@ const asyncHandler = require("express-async-handler");
 const getTimeScheduleE = async (req, res) => {
 
 
-  const timeSchedule = await TimeSchedule.findOne({ rfid: '3424265225' })
+  const timeSchedule = await TimeSchedule.findOne({ rfid: '0006338040' })
     .select({ 'schedule._id': 0 }) // Exclude the _id field inside the schedule object
     .exec();
 
