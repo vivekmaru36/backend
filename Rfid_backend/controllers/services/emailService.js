@@ -221,3 +221,31 @@ module.exports.sendRegisterdetails = async (params) => {
     return false;
   }
 };
+
+
+
+module.exports.sendRegisterdetailsT = async (params) => {
+  try {
+    let info = await transporter.sendMail({
+      from: MAIL_SETTINGS.auth.user,
+      to: params.to,
+      subject: `Your Details For Login are  `,
+      html: `
+        <div
+          class="container"
+          style="max-width: 90%; margin: auto; padding-top: 20px"
+        >
+          <h2>Your Password is : ${params.password}</h2>
+          <h2>Your email is : ${params.teacher.email}</h2>
+          <h2>Your Rfid is : ${params.teacher.rfid}</h2>
+          <h2>Your course is : ${params.teacher.course}</h2>
+          <h2>Your Year is : ${params.teacher.Year}</h2>
+     </div>
+      `,
+    });
+    return info;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};

@@ -26,14 +26,18 @@ const teacherSchema = new mongoose.Schema({
     type: String,
     default: "teacher",
   },
-  isVerified: {
+  Year: {
     type: String,
-    required: true
-  },
-  otp: {
-    type: Number,
-    // required: true,
-  },
+    required: true,
+  }
+  // isVerified: {
+  //   type: String,
+  //   required: true
+  // },
+  // otp: {
+  //   type: Number,
+  //   // required: true,
+  // },
 });
 
 module.exports = mongoose.model("Teacher", teacherSchema);

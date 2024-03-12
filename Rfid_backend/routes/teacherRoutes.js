@@ -12,7 +12,15 @@ router
   .post(teacherController.createNewTeacher);
 
 router
+  .route("/deleteTeacher")
+  .post(teacherController.deleteTeacher);
+
+router
+  .route("/allTeachers")
+  .get(teacherController.getAllTeachers);
+
+router
   .route("/:id")
-  .get(teacherController.getTeacher)
+  .get(teacherController.getTeacher);
 
 module.exports = router;

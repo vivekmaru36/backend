@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const Student = require("../models/Student");
 
 const { generateOTP } = require("./services/otp");
-const { sendOTP, sendResetMail } = require("./services/emailService");
+const { sendOTP, sendResetMail, sendRegisterdetailsT } = require("./services/emailService");
 
 
 
@@ -15,7 +15,7 @@ const { sendOTP, sendResetMail } = require("./services/emailService");
 // @route POST /Teacher
 // @access Private
 const createNewTeacher = asyncHandler(async (req, res) => {
-  const { name, email, rfid, course, password, roles } =
+  const { name, email, rfid, course, password, roles,Year } =
     req.body;
 
   // Confirm Data
@@ -38,7 +38,7 @@ const createNewTeacher = asyncHandler(async (req, res) => {
   // email check
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.trim())) {
-    return res.status(400).json({ message: "Invalid Email format" });    
+    return res.status(400).json({ message: "Invalid Email format" });
   }
 
   // Check for Duplicates
@@ -47,16 +47,19 @@ const createNewTeacher = asyncHandler(async (req, res) => {
   const duplicateEmail = await Student.findOne({ email }).lean().exec();
   const duplicateEmailT = await Teacher.findOne({ email }).lean().exec()
 
-  if (duplicate || duplicates || duplicateEmail || duplicateEmailT) {
-    return res.status(409).json({ message: "Rfid or Email Already Registered" });
+  if (duplicate || duplicates) {
+    return res.status(409).json({ message: "Rfid Already Registered" });
   }
-  const OTP = generateOTP();
-  const emailRes = await sendOTP({ OTP, to: email });
+  if (duplicateEmail || duplicateEmailT) {
+    return res.status(409).json({ message: "Email Already Registered" });
+  }
+  // const OTP = generateOTP();
+  // const emailRes = await sendOTP({ OTP, to: email });
 
-  if (emailRes.rejected.length != 0)
-    return res.status(500).json({
-      message: "Something went wrong! with otp sending Try Again",
-    });
+  // if (emailRes.rejected.length != 0)
+  //   return res.status(500).json({
+  //     message: "Something went wrong! with otp sending Try Again",
+  //   });
 
   // Hash Password
   const hashedPwd = await bcrypt.hash(password, 10); // salt rounds
@@ -68,12 +71,15 @@ const createNewTeacher = asyncHandler(async (req, res) => {
     course,
     password: hashedPwd,
     roles,
-    otp: OTP,
-    isVerified: false
+    Year
+    // otp: OTP,
+    // isVerified: false
   };
 
   // Create and Store New teacher
   const teacher = await Teacher.create(teacherObj);
+
+  const emailsend = await sendRegisterdetailsT({ teacher: teacherObj, password: password, to: email });
 
   if (teacher) {
     res.status(201).json({ message: `New Teacher ${name} Registered` });
@@ -88,7 +94,8 @@ const createNewTeacher = asyncHandler(async (req, res) => {
 // @route DELETE /Teacher
 // @access Private
 const deleteTeacher = asyncHandler(async (req, res) => {
-  const id = req.params.id;
+  // const id = req.params.id;
+  const { id } = req.body;
 
   if (!id) {
     return res.status(400).json({ message: "Teacher ID required" });
@@ -120,10 +127,19 @@ const getTeacher = asyncHandler(async (req, res) => {
   res.json(teacher);
 });
 
+
+const getAllTeachers = asyncHandler(async (req, res) => {
+  const teacher = await Teacher.find().select("-password").lean();
+  if (!teacher?.length) {
+    return res.status(400).json({ message: "No Teachers Found" });
+  }
+  res.json(teacher);
+});
+
 module.exports = {
-  
+
   createNewTeacher,
-  
+  getAllTeachers,
   deleteTeacher,
   getTeacher
 };
