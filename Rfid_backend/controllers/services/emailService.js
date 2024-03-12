@@ -196,3 +196,28 @@ module.exports.sendRfidSwipeMail4 = async (params) => {
     return false;
   }
 };
+
+
+module.exports.sendRegisterdetails = async (params) => {
+  try {
+    let info = await transporter.sendMail({
+      from: MAIL_SETTINGS.auth.user,
+      to: params.to,
+      subject: `Your Details For Login are  `,
+      html: `
+        <div
+          class="container"
+          style="max-width: 90%; margin: auto; padding-top: 20px"
+        >
+          <h2>Your Password is : ${params.password}</h2>
+          <h2>Your email is : ${params.student.email}</h2>
+          <h2>Your Rfid is : ${params.student.rfid}</h2>
+     </div>
+      `,
+    });
+    return info;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};

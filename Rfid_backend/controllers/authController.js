@@ -2,6 +2,7 @@ const Teacher = require("./../models/Teacher");
 const Student = require("./../models/Student");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
+const Admin_model = require("../models/Admin_model");
 
 // @desc Auth Login
 // @route POST /auth/login/teacher
@@ -88,4 +89,43 @@ const studentLogin = asyncHandler(async (req, res) => {
 // // @access Public
 // const logout = asyncHandler(async (req, res) => {});
 
-module.exports = { teacherLogin, studentLogin };
+const adminLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  console.log(email);
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "All Fields are required" });
+  }
+  const admin = await Admin_model.findOne({ email }).exec();
+
+  if (!admin) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  // const match = await bcrypt.compare(password, admin.password);
+  // console.log('user sended :' ,password);
+  // console.log('decrypt :',student.password);
+  // if (!match) return res.status(401).json({ message: "Incorrect Password" });
+
+
+  if (!admin) {
+    // Delete the particular student
+    return res.status(501).json({ message: "Admin Not Found" });
+  }
+
+  else {
+    res.status(200).json({
+      _id: admin.id,
+      name: admin.name,
+      role: "admin",
+      // rfid : student.rfid,
+      // course:student.course,
+      email:admin.email,
+      // Year:student.Year
+    });
+  }
+});
+
+
+module.exports = { teacherLogin, studentLogin,adminLogin };

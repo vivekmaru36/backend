@@ -4,6 +4,7 @@ const authController = require("./../controllers/authController");
 
 router.route("/login/teacher").post(authController.teacherLogin);
 router.route("/login/student").post(authController.studentLogin);
+router.route("/login/admin").post(authController.adminLogin);
 
 //? Incase of JWT
 //   .route("/logout")

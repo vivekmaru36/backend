@@ -32,7 +32,7 @@ const studentSchema = new mongoose.Schema({
   },
   isVerified: {
     type: String,
-    required: true
+    // required: true
   }
 });
 

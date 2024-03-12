@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 // Manage OTP & Reset Email
 const { generateOTP } = require("./services/otp");
-const { sendOTP, sendResetMail } = require("./services/emailService");
+const { sendOTP, sendResetMail, sendRegisterdetails } = require("./services/emailService");
 const Teacher = require("../models/Teacher");
 
 const HardwareRfidSwipe = require("../models/HardwareRfidSwipe");
@@ -68,15 +68,21 @@ const createNewStudent = asyncHandler(async (req, res) => {
   const duplicatet = await Teacher.findOne({ rfid }).lean().exec();
 
   if (duplicate || duplicatet || duplicateEmailT || duplicateEmail) {
-    return res.status(409).json({ message: "Already Registered" });
+    return res.status(409).json({ message: "Already Registered Email" });
   }
-  const OTP = generateOTP();
-  const emailRes = await sendOTP({ OTP, to: email });
 
-  if (emailRes.rejected.length != 0)
-    return res.status(500).json({
-      message: "Something went wrong! with otp sending Try Again",
-    });
+  if (duplicate || duplicatet ) {
+    return res.status(409).json({ message: "Already Registered Rfid" });
+  }
+  // const OTP = generateOTP();
+  // const emailRes = await sendOTP({ OTP, to: email });
+
+  
+
+  // if (emailRes.rejected.length != 0)
+  //   return res.status(500).json({
+  //     message: "Something went wrong! with otp sending Try Again",
+  //   });
 
   // Hash Password
   const hashedPwd = await bcrypt.hash(password, 10); // salt rounds
@@ -88,12 +94,13 @@ const createNewStudent = asyncHandler(async (req, res) => {
     rfid,
     password: hashedPwd,
     Year: Year,
-    otp: OTP,
-    isVerified: false
+    // otp: OTP,
+    // isVerified: false
   };
 
   // Create and Store New student
   const student = await Student.create(studentObj);
+  const emailsend = await sendRegisterdetails({student : studentObj,password:password,to:email});
 
   if (student) {
     res.status(201).json({ message: `New Student ${name} created` });
@@ -147,6 +154,8 @@ const updateStudent = asyncHandler(async (req, res) => {
 // @access Private
 const deleteStudent = asyncHandler(async (req, res) => {
   const { id } = req.body;
+
+  console.log(id)
 
   if (!id) {
     return res.status(400).json({ message: "Student ID required" });
