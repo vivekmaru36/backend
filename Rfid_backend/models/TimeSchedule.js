@@ -41,18 +41,15 @@ const daySchema = new mongoose.Schema({
 
 // Time Schedule of the Teacher
 const timeScheduleSchema = new mongoose.Schema({
-  teacher: {
+  admin: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Teacher",
+    ref: "Adminnew",
   },
   schedule: daySchema,
-  sdate: {
-    type:Date
-  },
-  rfid: {
+  Week: {
     type:String
-  }
+  },
 });
 
 module.exports = mongoose.model("Time_Schedule", timeScheduleSchema);

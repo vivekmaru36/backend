@@ -43,18 +43,22 @@ const getTimeSchedule = async (req, res) => {
 // @route POST /time_Schedule
 // @access Private
 const addTimeSchedule = asyncHandler(async (req, res) => {
-  const { teacher, schedule, date, rfid } = req.body;
+  const { admin, data, } = req.body;
 
   // Confirm Data
-  if (!teacher || !schedule || !date) {
+  if (!admin || !data) {
     return res
       .status(400)
       .json({ message: "Incomplete Request: Fields Missing" });
   }
 
+  console.log(admin)
+  console.log(data.schedule.monday);
+  // console.log(Week)
+
   // Check for Duplicates
   const duplicate = await TimeSchedule.findOne({
-    teacher: teacher,
+    admin: admin,
   })
     .lean()
     .exec();
@@ -64,10 +68,9 @@ const addTimeSchedule = asyncHandler(async (req, res) => {
   }
 
   const TimeScheduleObj = {
-    teacher,
-    schedule,
-    sdate: date,
-    rfid: rfid
+    admin,
+    // schedule,
+    // Week
   };
 
   // Create and Store New Time Schedule
