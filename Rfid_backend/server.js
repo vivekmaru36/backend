@@ -30,6 +30,7 @@ app.use("/auth", require("./routes/authRoutes"));
 
 app.use("/teacher", require("./routes/teacherRoutes"));
 app.use("/student", require("./routes/studentRoutes"));
+app.use("/admin", require("./routes/AdminRoutes"));
 
 app.use("/Hardware", require("./routes/HardwareRoutes"));
 app.use("/otp",require("./routes/otp"));
