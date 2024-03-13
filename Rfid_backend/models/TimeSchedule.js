@@ -13,7 +13,7 @@ const daySchema = new mongoose.Schema({
     {
       type: String,
       required: true,
-      default: [],
+      default: [], 
     },
   ],
   wednesday: [
