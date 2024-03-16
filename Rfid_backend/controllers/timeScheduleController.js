@@ -14,7 +14,7 @@ const getTimeScheduleE = async (req, res) => {
 
   if (!timeSchedule) {
     return res.status(404).json({
-      message: `Time Schedule not found`,
+      message: `Time Schedule not found s`,
     });
   }
   console.log(timeSchedule);
@@ -29,7 +29,7 @@ const getTimeSchedule = async (req, res) => {
     return res.status(400).json({ message: "ID Required" });
   }
   const timeSchedule = await TimeSchedule.findOne({
-    teacher: req.params.teacher_id,
+    admin: req.params.teacher_id,
   }).exec();
   if (!timeSchedule) {
     return res.status(404).json({
