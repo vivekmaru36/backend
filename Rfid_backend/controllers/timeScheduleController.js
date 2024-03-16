@@ -42,48 +42,169 @@ const getTimeSchedule = async (req, res) => {
 // @desc Add TimeSchedule
 // @route POST /time_Schedule
 // @access Private
+// const addTimeSchedule = asyncHandler(async (req, res) => {
+//   const { admin, data, Week, Year } = req.body;
+
+//   // Confirm Data
+//   if (!admin || !data || !Week || !Year) {
+//     return res.status(400).json({ message: "Incomplete Request: Fields Missing" });
+//   }
+
+//   try {
+//     // Check for Duplicates
+//     const existingSchedule = await TimeSchedule.findOne({ admin });
+//     if (existingSchedule) {
+//       return res.status(409).json({ message: "Time Schedule already exists" });
+//     }
+
+//     console.log(data.schedule.monday[0].venue);
+
+//     // Construct the time schedule object
+//     const timeScheduleObj = {
+//       admin,
+//       schedule: {
+//         monday: {
+//           0: {
+//             venue: data.schedule.monday[0] ? data.schedule.monday[0].venue : null,
+//             teacher: data.schedule.monday[0] ? data.schedule.monday[0].teacher : null,
+//             subject: data.schedule.monday[0] ? data.schedule.monday[0].subject : null
+//           },
+//           1: {
+//             venue: data.schedule.monday[1] ? data.schedule.monday[1].venue : null,
+//             teacher: data.schedule.monday[1] ? data.schedule.monday[1].teacher : null,
+//             subject: data.schedule.monday[1] ? data.schedule.monday[1].subject : null
+//           },
+//           2: {
+//             venue: data.schedule.monday[2] ? data.schedule.monday[2].venue : null,
+//             teacher: data.schedule.monday[2] ? data.schedule.monday[2].teacher : null,
+//             subject: data.schedule.monday[2] ? data.schedule.monday[2].subject : null
+//           },
+//           3: {
+//             venue: data.schedule.monday[3] ? data.schedule.monday[3].venue : null,
+//             teacher: data.schedule.monday[3] ? data.schedule.monday[3].teacher : null,
+//             subject: data.schedule.monday[3] ? data.schedule.monday[3].subject : null
+//           },
+//           4: {
+//             venue: data.schedule.monday[4] ? data.schedule.monday[4].venue : null,
+//             teacher: data.schedule.monday[4] ? data.schedule.monday[4].teacher : null,
+//             subject: data.schedule.monday[4] ? data.schedule.monday[4].subject : null
+//           }
+//         },
+//         tuesday: {
+//           // Repeat similar structure for tuesday
+//           0: {
+//             venue: data.schedule.tuesday[0] ? data.schedule.tuesday[0].venue : null,
+//             teacher: data.schedule.tuesday[0] ? data.schedule.tuesday[0].teacher : null,
+//             subject: data.schedule.tuesday[0] ? data.schedule.tuesday[0].subject : null
+//           },
+//           1: {
+//             venue: data.schedule.tuesday[1] ? data.schedule.tuesday[1].venue : null,
+//             teacher: data.schedule.tuesday[1] ? data.schedule.tuesday[1].teacher : null,
+//             subject: data.schedule.tuesday[1] ? data.schedule.tuesday[1].subject : null
+//           },
+//           2: {
+//             venue: data.schedule.tuesday[2] ? data.schedule.tuesday[2].venue : null,
+//             teacher: data.schedule.tuesday[2] ? data.schedule.tuesday[2].teacher : null,
+//             subject: data.schedule.tuesday[2] ? data.schedule.tuesday[2].subject : null
+//           },
+//           3: {
+//             venue: data.schedule.tuesday[3] ? data.schedule.tuesday[3].venue : null,
+//             teacher: data.schedule.tuesday[3] ? data.schedule.tuesday[3].teacher : null,
+//             subject: data.schedule.tuesday[3] ? data.schedule.tuesday[3].subject : null
+//           },
+//           4: {
+//             venue: data.schedule.tuesday[4] ? data.schedule.tuesday[4].venue : null,
+//             teacher: data.schedule.tuesday[4] ? data.schedule.tuesday[4].teacher : null,
+//             subject: data.schedule.tuesday[4] ? data.schedule.tuesday[4].subject : null
+//           }
+//         },
+//         wednesday: {
+//           // Repeat similar structure for wednesday
+//         },
+//         thursday: {
+//           // Repeat similar structure for thursday
+//         },
+//         friday: {
+//           // Repeat similar structure for friday
+//         }
+//       },
+//       Week,
+//       Year
+//     };
+
+//     // Create and Store New Time Schedule
+//     const record = await TimeSchedule.create(timeScheduleObj);
+
+//     if (record) {
+//       return res.status(201).json({ message: `Time Schedule added successfully` });
+//     } else {
+//       return res.status(400).json({ message: "Failed to add time schedule" });
+//     }
+//   } catch (error) {
+//     console.error("Error adding time schedule:", error);
+//     return res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
+
 const addTimeSchedule = asyncHandler(async (req, res) => {
-  const { admin, data, } = req.body;
+  const { admin, data, Week, Year } = req.body;
 
   // Confirm Data
-  if (!admin || !data) {
-    return res
-      .status(400)
-      .json({ message: "Incomplete Request: Fields Missing" });
+  if (!admin || !data || !Week || !Year) {
+    return res.status(400).json({ message: "Incomplete Request: Fields Missing" });
   }
 
-  console.log(admin)
-  console.log(data.schedule.monday);
-  // console.log(Week)
+  try {
+    // Check for Duplicates
+    const existingSchedule = await TimeSchedule.findOne({ admin });
+    if (existingSchedule) {
+      return res.status(409).json({ message: "Time Schedule already exists" });
+    }
 
-  // Check for Duplicates
-  const duplicate = await TimeSchedule.findOne({
-    admin: admin,
-  })
-    .lean()
-    .exec();
+    // Convert the schedule object to an array for each day
+    // const convertedSchedule = {
+    //   monday: Object.values(data.schedule.monday),
+    //   tuesday: Object.values(data.schedule.tuesday),
+    //   wednesday: Object.values(data.schedule.wednesday),
+    //   thursday: Object.values(data.schedule.thursday),
+    //   friday: Object.values(data.schedule.friday)
+    // };
 
-  if (duplicate) {
-    return res.status(409).json({ message: "Time Schedule already exists" });
-  }
+    const convertedSchedule = {
+      monday: data.schedule.monday,
+      tuesday: data.schedule.tuesday,
+      wednesday: data.schedule.wednesday,
+      thursday: data.schedule.thursday,
+      friday: data.schedule.friday
+    };
 
-  const TimeScheduleObj = {
-    admin,
-    // schedule,
-    // Week
-  };
+    // Construct the time schedule object
+    const timeScheduleObj = {
+      admin,
+      // schedule: convertedSchedule,
+      schedule: data.schedule,
+      Week,
+      Year
+    };
 
-  // Create and Store New Time Schedule
-  const record = await TimeSchedule.create(TimeScheduleObj);
+    // Create and Store New Time Schedule
+    const record = await TimeSchedule.create(timeScheduleObj);
 
-  if (record) {
-    res.status(201).json({
-      message: `Time Schedule added successfully`,
-    });
-  } else {
-    res.status(400).json({ message: "Invalid data received" });
+    if (record) {
+      return res.status(201).json({ message: `Time Schedule added successfully` });
+    } else {
+      return res.status(400).json({ message: "Failed to add time schedule" });
+    }
+  } catch (error) {
+    console.error("Error adding time schedule:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+
+
+
+
 
 // @desc Update TimeSchedule
 // @route PATCH /TimeSchedule
