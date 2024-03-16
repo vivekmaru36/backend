@@ -5,19 +5,16 @@ const asyncHandler = require("express-async-handler");
 // @desc Get TimeSchedule for everyone
 // @route GET /TimeSchedulefor everyone
 // @access Everyone
+// Fy bsc cs
 const getTimeScheduleE = async (req, res) => {
-
-
-  const timeSchedule = await TimeSchedule.findOne({ rfid: '0006338040' })
-    .select({ 'schedule._id': 0 }) // Exclude the _id field inside the schedule object
-    .exec();
-
+  const timeSchedule = await TimeSchedule.findOne({
+    admin: '65f0248b6ad21562b5726b00',
+  }).exec();
   if (!timeSchedule) {
     return res.status(404).json({
-      message: `Time Schedule not found s`,
+      message: `Time Schedule not found`,
     });
   }
-  console.log(timeSchedule);
   res.json(timeSchedule);
 };
 
