@@ -83,14 +83,17 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 await newCreditPoint.save();
             }
             else{
-                await creditPoint.updateOne({
+                await Credits.updateOne({
                     rfid: rfid
                 },{
                     $inc:{
                         credit_point: 1
                     }
-                })
+                });
+
             }
+            const updatedcreditPoint = await Credits.findOne({ rfid: rfid });
+
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -104,7 +107,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 from: 'group14rfid@gmail.com',
                 to: student.email,
                 subject: 'Invoice',
-                html: `<p>Dear User,</p><p>Hurray! you earned 1 credit point</p><p>Your available credit point in your account is ${creditPoint.credit_point}</p>`
+                html: `<p>Dear User,</p><p>Hurray! you earned 1 credit point</p><p>Your available credit point in your account is ${updatedcreditPoint.credit_point}</p>`
             };
 
             transporter.sendMail(creditOptions, (error, info) => {
