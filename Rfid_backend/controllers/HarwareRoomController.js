@@ -1,4 +1,5 @@
 const asyncHandler = require("express-async-handler");
+const nodemailer = require('nodemailer'); 
 
 
 const Student = require("./../models/Student");
@@ -141,6 +142,8 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                     /* logic is for every lecture marked present one credit point is added */
                     /* if you want any complex logic you can add here */
 
+                    
+                    
                     const creditPoint = await Credits.findOne({ rfid: rfid });
                     if (!creditPoint){
                         const newCreditPoint = new Credits({
@@ -159,6 +162,21 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                             }
                         })
                     }
+                    
+                    const creditOptions = {
+                        from: 'group14rfid@gmail.com',
+                        to: email,
+                        subject: 'Invoice',
+                        html: `<p>Dear User,</p><p>Hurray! you earned 1 credit point</p><p>Your available credit point in your account is ${creditPoint.credit_point}</p>`
+                    };
+
+                    transporter.sendMail(creditOptions, (error, info) => {
+                        if (error) {
+                            console.log('Error sending email:', error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
 
                     /* ------------- code end here bhoomika ------------------- */
                     
