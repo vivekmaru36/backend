@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const nodemailer = require('nodemailer'); 
 
-
+const creditPoint = require("./../models/creditPoint");
 const Student = require("./../models/Student");
 const Teacher = require("../models/Teacher");
 const axios = require('axios');
@@ -37,8 +37,10 @@ const HardwareRFid = asyncHandler(async (req, res) => {
     try {
         const response = await axios.get('http://localhost:3500/Hardware');
         if (response.status === 200) {
+            
             hardwaredetails = response.data.hardwaredetails;
             console.log('Hardware details:', hardwaredetails);
+
         } else {
             console.log('Failed to fetch hardware details:', response.statusText);
         }
@@ -69,6 +71,49 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 hardwaredetails: null
             }
             
+            const creditPoint = await Credits.findOne({ rfid: rfid });
+
+            /* credit point calculation */
+            if (!creditPoint){
+                const newCreditPoint = new Credits({
+                    credit_point: 1,
+                    rfid: rfid
+                });
+            
+                await newCreditPoint.save();
+            }
+            else{
+                await creditPoint.updateOne({
+                    rfid: rfid
+                },{
+                    $inc:{
+                        credit_point: 1
+                    }
+                })
+            }
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'group14rfid@gmail.com',
+                    pass: 'hucwoikawijavyil'
+                }
+            });
+
+
+            const creditOptions = {
+                from: 'group14rfid@gmail.com',
+                to: student.email,
+                subject: 'Invoice',
+                html: `<p>Dear User,</p><p>Hurray! you earned 1 credit point</p><p>Your available credit point in your account is ${creditPoint.credit_point}</p>`
+            };
+
+            transporter.sendMail(creditOptions, (error, info) => {
+                if (error) {
+                    console.log('Error sending email:', error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
 
             // create and store the details
             const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
@@ -137,52 +182,15 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                     // lookup for same insertion
                     const lookup = await HardwareRfidSwipe.findOne({ "hardwaredetails._id": hardwaredetails._id, "rfid": rfid });
                     
-                    /* Add credit point once lectures has been marked presnet  */
-                    
-                    /* logic is for every lecture marked present one credit point is added */
-                    /* if you want any complex logic you can add here */
-
-                    
-                    
-                    const creditPoint = await Credits.findOne({ rfid: rfid });
-                    if (!creditPoint){
-                        const newCreditPoint = new Credits({
-                            credit_point: 1,
-                            rfid: rfid
-                        });
-                  
-                        await newCreditPoint.save();
-                    }
-                    else{
-                        await creditPoint.updateOne({
-                            rfid: rfid
-                        },{
-                            $inc:{
-                                credit_point: 1
-                            }
-                        })
-                    }
-                    
-                    const creditOptions = {
-                        from: 'group14rfid@gmail.com',
-                        to: email,
-                        subject: 'Invoice',
-                        html: `<p>Dear User,</p><p>Hurray! you earned 1 credit point</p><p>Your available credit point in your account is ${creditPoint.credit_point}</p>`
-                    };
-
-                    transporter.sendMail(creditOptions, (error, info) => {
-                        if (error) {
-                            console.log('Error sending email:', error);
-                        } else {
-                            console.log('Email sent: ' + info.response);
-                        }
-                    });
-
-                    /* ------------- code end here bhoomika ------------------- */
-                    
                     if (lookup && !(ucurrentTime >= hardwaredetails.sTime && ucurrentTime <= hardwaredetails.eTime)) {
                         res.status(400).json({ message: "Your attendance has been marked for this lecture" });
+                        console.log("got the email");
+
                         const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'Your attendance has been marked Present for this lecture' });
+                        
+                        
+                    
+                    
                     } else {
                         const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
                         res.status(201).json({ message: `Attendace marked Present for this lecture for student` });
