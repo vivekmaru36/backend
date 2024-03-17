@@ -9,7 +9,7 @@ const corsOptions = require("./config/corsOptions");
 const connectDB = require("./config/dbConn");
 const mongoose = require("mongoose");
 
-const PORT = process.env.PORT || 3500;
+const PORT = 3500;
 
 connectDB();
 
@@ -22,7 +22,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/", express.static("public"));
-``;
 
 app.use("/", require("./routes/root"));
 
@@ -34,10 +33,16 @@ app.use("/admin", require("./routes/AdminRoutes"));
 
 app.use("/Hardware", require("./routes/HardwareRoutes"));
 app.use("/otp",require("./routes/otp"));
+app.use("/walletFetch",require("./routes/Wallet"));
+
 app.use("/HardwareRoom",require("./routes/HardwareRoomRfidRoutes"));
 app.use("/RecentRecords",require("./routes/RecentRecordsRoutes"));
 app.use("/LecHistory",require("./routes/LecHistoryRoutes"));
 app.use("/time_schedule", require("./routes/TimeScheduleRoutes"));
+
+app.use("/addMoney",require("./routes/addMoneyRoutes"));
+app.use("/transactionsFetch",require("./routes/transactionRoutes"));
+app.use("/placeOrder",require("./routes/placeOrder"))
 
 app.all("*", (req, res) => {
   res.status(404);
@@ -66,3 +71,4 @@ mongoose.connection.on("error", (err) => {
 mongoose.connection.on("uncaughtException", function (err) {
   console.log(err);
 });
+

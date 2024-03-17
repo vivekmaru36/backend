@@ -15,6 +15,6 @@ const getAdmin = asyncHandler(async (req, res) => {
   });
 
 module.exports = {
-    getAdmin
+  getAdmin
 };
   
