@@ -5,7 +5,7 @@ const creditSchema = new mongoose.Schema({
     type: String,
     required : true
   },
-  creditPoint: {
+  credit_point: {
     type: Number,
     default: 0,
   },

@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const Student = require("./../models/Student");
 const Teacher = require("../models/Teacher");
 const axios = require('axios');
+const Credits = require("./../models/creditPoint");
 
 const { sendRfidSwipeMail, sendRfidSwipeMail2, sendRfidSwipeMail3, sendRfidSwipeMail4 } = require("./services/emailService");
 
@@ -36,7 +37,7 @@ const HardwareRFid = asyncHandler(async (req, res) => {
         const response = await axios.get('http://localhost:3500/Hardware');
         if (response.status === 200) {
             hardwaredetails = response.data.hardwaredetails;
-            // console.log('Hardware details:', hardwaredetails);
+            console.log('Hardware details:', hardwaredetails);
         } else {
             console.log('Failed to fetch hardware details:', response.statusText);
         }
@@ -47,7 +48,6 @@ const HardwareRFid = asyncHandler(async (req, res) => {
     }
 
     // console.log(hardwaredetails._id);
-    console.log(hardwaredetails);
 
     const student = await Student.findOne({ rfid }).lean().exec();
     const teacher = await Teacher.findOne({ rfid }).lean().exec();
@@ -67,6 +67,8 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                 details: student,
                 hardwaredetails: null
             }
+            
+
             // create and store the details
             const hardwareswipe = await HardwareRfidSwipe.create(HardwareRfidSwipesObj);
             if (hardwareswipe) {
@@ -130,8 +132,36 @@ const HardwareRFid = asyncHandler(async (req, res) => {
                         hardwaredetails: hardwaredetails,
                         attendance: "Present"
                     }
+
                     // lookup for same insertion
                     const lookup = await HardwareRfidSwipe.findOne({ "hardwaredetails._id": hardwaredetails._id, "rfid": rfid });
+                    
+                    /* Add credit point once lectures has been marked presnet  */
+                    
+                    /* logic is for every lecture marked present one credit point is added */
+                    /* if you want any complex logic you can add here */
+
+                    const creditPoint = await Credits.findOne({ rfid: rfid });
+                    if (!creditPoint){
+                        const newCreditPoint = new Credits({
+                            credit_point: 1,
+                            rfid: rfid
+                        });
+                  
+                        await newCreditPoint.save();
+                    }
+                    else{
+                        await creditPoint.updateOne({
+                            rfid: rfid
+                        },{
+                            $inc:{
+                                credit_point: 1
+                            }
+                        })
+                    }
+
+                    /* ------------- code end here bhoomika ------------------- */
+                    
                     if (lookup && !(ucurrentTime >= hardwaredetails.sTime && ucurrentTime <= hardwaredetails.eTime)) {
                         res.status(400).json({ message: "Your attendance has been marked for this lecture" });
                         const emailsend = await sendRfidSwipeMail({ details: ucurrentTime, to: student.email, message: 'Your attendance has been marked Present for this lecture' });

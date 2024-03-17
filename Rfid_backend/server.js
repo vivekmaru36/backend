@@ -44,6 +44,8 @@ app.use("/addMoney",require("./routes/addMoneyRoutes"));
 app.use("/transactionsFetch",require("./routes/transactionRoutes"));
 app.use("/placeOrder",require("./routes/placeOrder"))
 
+app.use("/fetchCreditPoint",require("./routes/fetchCreditPoint"))
+
 app.all("*", (req, res) => {
   res.status(404);
   if (req.accepts("json")) {

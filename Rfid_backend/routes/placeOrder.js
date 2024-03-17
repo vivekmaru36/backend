@@ -6,6 +6,7 @@ const Temptransactions = require("./../models/temporaryTransaction");
 const {v4 : uuidv4} = require('uuid')
 const nodemailer = require('nodemailer'); 
 const Transactions = require("./../models/transactions");
+const Credits = require("../models/creditPoint");
 
 router.post("/", async (req, res) => {
     const { products, rfid, email } = req.body;
@@ -52,10 +53,10 @@ router.post("/sucess",async (req,res) => {
             const amount = parseFloat(tempTransactions.amount);
             const email = tempTransactions.email;
             const availableBalance = tempTransactions.availableBalance;
-
+            const transactionType = tempTransactions.transactionType;
             if (rfidNumber === tempTransactions.rfid){
                 const userWallet = await Wallets.findOne({rfid: rfidNumber});
-
+                
                 const transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
@@ -71,6 +72,15 @@ router.post("/sucess",async (req,res) => {
                     html: `<p>Dear User,</p><p>Your invoice for the transaction with ID: ${transactionId} has been generated.</p><p>Amount: ${amount} is deducted from your account</p>`
                 };
 
+                const creditOptions = {
+                    from: 'group14rfid@gmail.com',
+                    to: email,
+                    subject: 'Invoice',
+                    html: `<p>Dear User,</p><p>Your invoice for the transaction with ID: ${transactionId} has been generated.</p><p>Amount: ${amount} is credit to your account</p>`
+                };
+
+
+
                 const insufficientOptions = {
                     from: 'group14rfid@gmail.com',
                     to: email,
@@ -79,26 +89,35 @@ router.post("/sucess",async (req,res) => {
                 };
             
                 if (userWallet){
-                    if (amount <= availableBalance ){
-                        
-                        transporter.sendMail(mailOptions, (error, info) => {
+                    
+                    if (transactionType === "credit"){
+                        const credits = await Credits.findOne({rfid:rfid});
+
+                        transporter.sendMail(creditOptions, (error, info) => {
                             if (error) {
                                 console.log('Error sending email:', error);
                             } else {
                                 console.log('Email sent: ' + info.response);
                             }
                         });
-                        
                         await Wallets.updateOne(
                             { rfid: rfidNumber },
                             {
                                 $inc: {
-                                    totalBalance: -amount, 
+                                    totalBalance: amount, 
                                 },
                             }
                         );
+                        
+                        await credits.updateOne(
+                            {rfid: rfidNumber},
+                            {
+                                $inc: {
+                                    credit_point: amount, 
+                                },
+                            }
+                        )
 
-                        //delete temporary transactions
                         await Temptransactions.deleteOne({ temp_trans_uid: transactionId });
                         
                         const trans_id = uuidv4()
@@ -111,28 +130,77 @@ router.post("/sucess",async (req,res) => {
                             trans_uid: trans_id,
                             rfid: rfidNumber,
                             transactionDate:transactionDate,
-                            credit:0,
-                            debit: amount,
-                            forWhat:"Canteen money debited",
+                            credit:amount,
+                            debit: 0,
+                            forWhat:"Credit point money",
                             totalBalance: updatedUserWallet.totalBalance
                         })
 
                         await newTransactions.save();
-                       
-                        return res.status(200).json({success:true});
 
+
+                        
+                        return res.status(200).json({success:true});
+                            
                     }
                     else{
-                        transporter.sendMail(insufficientOptions, (error, info) => {
-                            if (error) {
-                                console.log('Error sending email:', error);
-                            } else {
-                                console.log('Email sent: ' + info.response);
-                            }
-                        });
-                        return res.status(200).json({success:true,message:"not sufficient money!"});
-
+                        if (amount <= availableBalance ){
+                        
+                            transporter.sendMail(mailOptions, (error, info) => {
+                                if (error) {
+                                    console.log('Error sending email:', error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+    
+                            await Wallets.updateOne(
+                                { rfid: rfidNumber },
+                                {
+                                    $inc: {
+                                        totalBalance: -amount, 
+                                    },
+                                }
+                            );
+    
+                            //delete temporary transactions
+                            await Temptransactions.deleteOne({ temp_trans_uid: transactionId });
+                            
+                            const trans_id = uuidv4()
+                            const currentDate = new Date();
+                            const transactionDate = currentDate.toLocaleDateString('en-GB').toString();
+                            const updatedUserWallet = await Wallets.findOne({rfid: rfidNumber});
+    
+                            // create new transactions
+                            const newTransactions = new Transactions({
+                                trans_uid: trans_id,
+                                rfid: rfidNumber,
+                                transactionDate:transactionDate,
+                                credit:0,
+                                debit: amount,
+                                forWhat:"Canteen money debited",
+                                totalBalance: updatedUserWallet.totalBalance
+                            })
+    
+                            await newTransactions.save();
+                           
+                            return res.status(200).json({success:true});
+    
+                        }
+                        else{
+                            transporter.sendMail(insufficientOptions, (error, info) => {
+                                if (error) {
+                                    console.log('Error sending email:', error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+                            return res.status(200).json({success:true,message:"not sufficient money!"});
+    
+                        }
                     }
+                    
+                    
                 }else{
                     return res.status(200).json({success:true,message:"wrong rfid!"});
                 }

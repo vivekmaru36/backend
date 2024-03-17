@@ -14,7 +14,7 @@ const Wallet = asyncHandler(async (req, res) => {
         });
 
         await newWallet.save();
-        return res.status(200).json({ success: true });
+        return res.status(200).json({ success: true, data:0 });
       }    
       
 
